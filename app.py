@@ -1,54 +1,72 @@
-
 from flask import Flask, request
-import openai
-import os
 from twilio.twiml.messaging_response import MessagingResponse
 
 app = Flask(__name__)
 
-openai.api_key = os.environ.get("OPENAI_API_KEY")
-
 MENU_INICIAL = (
     "🌿 *Consorcio Funerario te da la bienvenida.*\n"
-    "¿En qué podemos ayudarte?\n"
+    "¿En qué podemos ayudarte?\n\n"
     "1️⃣ Promociones\n"
     "2️⃣ Planes funerarios\n"
     "3️⃣ Emergencias\n"
-    "4️⃣ Ubicación\n\n"
-    "Responde con el número de la opción."
+    "4️⃣ Ubicación\n"
+    "Escribe el número de la opción que deseas."
 )
 
-@app.route("/whatsapp", methods=["POST"])
+# Base de datos simplificada (puedes ampliarla luego)
+base_respuestas = [
+    {
+        "intenciones": ["hola", "buenos días", "buenas tardes", "buenas"],
+        "respuesta": MENU_INICIAL
+    },
+    {
+        "intenciones": ["qué servicios tienen", "hacen cremación", "traslados", "servicios funerarios"],
+        "respuesta": "Ofrecemos servicios funerarios integrales como cremación, embalsamado, traslado local y nacional, sala de velación, entre otros."
+    },
+    {
+        "intenciones": ["cuánto cuesta", "qué planes", "hay mensualidades"],
+        "respuesta": "Tenemos planes desde $7,540 MXN, con opción de pago en mensualidades desde $193."
+    },
+    {
+        "intenciones": ["promoción", "planes a futuro", "tranquilidad individual", "familiar"],
+        "respuesta": "Contamos con planes Tranquilidad Individual y Tranquilidad Familiar. Pregunta por nuestras promociones actuales."
+    },
+    {
+        "intenciones": ["falleció", "urgente", "emergencia", "ayuda urgente"],
+        "respuesta": "Lamentamos su pérdida. Para atención inmediata, por favor llame al 55 23 68 07 34. Estamos para servirle."
+    }
+]
+
+@app.route("/webhook", methods=["POST"])
 def whatsapp():
     incoming_msg = request.values.get("Body", "").strip().lower()
     resp = MessagingResponse()
     msg = resp.message()
 
-    if incoming_msg in ["hola", "buenas", "buenas tardes"]:
-        msg.body(MENU_INICIAL)
+    respuesta = None
 
-    elif incoming_msg == "1":
-        msg.body("📢 Nuestras promociones: Plan básico desde $193/mes. ¡Pregunta por disponibilidad esta semana!")
-
-    elif incoming_msg == "2":
-        msg.body("⚰️ Tenemos planes: Básico, Intermedio, Plus y Mi Última Voluntad. ¿Cuál te interesa conocer?")
-
-    elif incoming_msg == "3":
-        msg.body("🚨 Atención inmediata 24/7. Por favor escribe *EMERGENCIA* seguido del nombre y ubicación.")
-
-    elif incoming_msg == "4":
-        msg.body("📍 Estamos en Av. Tláhuac #5502, Iztapalapa, CDMX. También contamos con sucursales en San Lorenzo Tezonco.")
-
+    # Opciones directas por número
+    if incoming_msg in ["1", "promociones"]:
+        respuesta = "Actualmente tenemos promociones en planes desde $193/mes. ¿Te gustaría que un asesor te contacte?"
+    elif incoming_msg in ["2", "planes", "planes funerarios"]:
+        respuesta = "Nuestros planes: Básico, Intermedio, Plus y Mi Última Voluntad. ¿Cuál te interesa conocer?"
+    elif incoming_msg in ["3", "emergencia", "urgente"]:
+        respuesta = "⛑ Atención inmediata 24/7. Por favor escribe *EMERGENCIA* seguido del nombre y ubicación."
+    elif incoming_msg in ["4", "ubicación"]:
+        respuesta = "📍 Estamos en Av. Tláhuac #5502, Iztapalapa, CDMX. También contamos con sucursales en San Lorenzo Tezonco."
     else:
-        completion = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "Eres un asistente amable y profesional de una funeraria."},
-                {"role": "user", "content": incoming_msg}
-            ]
-        )
-        reply = completion.choices[0].message.content.strip()
-    msg.body(reply)
+        for entrada in base_respuestas:
+            for intento in entrada["intenciones"]:
+                if intento in incoming_msg:
+                    respuesta = entrada["respuesta"]
+                    break
+            if respuesta:
+                break
+
+    if not respuesta:
+        respuesta = "Gracias por su mensaje. Un asesor se comunicará con usted en breve."
+
+    msg.body(respuesta)
     return str(resp), 200, {'Content-Type': 'application/xml'}
 
 if __name__ == "__main__":
