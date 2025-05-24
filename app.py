@@ -50,7 +50,7 @@ def whatsapp():
         reply = completion.choices[0].message.content.strip()
         msg.body(reply)
 
-    return str(resp)
+return str(resp), 200, {'Content-Type': 'application/xml'}
 
 if __name__ == "__main__":
     app.run()
