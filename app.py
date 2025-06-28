@@ -15,9 +15,10 @@ def contiene_emergencia(mensaje):
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
-    data = request.get_json()
-    mensaje = data.get("body", "").lower()
-    telefono_cliente = data.get("from", "")
+    # Para sandbox usamos 'Body' y 'From'
+    data = request.form if request.form else request.get_json()
+    mensaje = data.get("Body", "").lower()
+    telefono_cliente = data.get("From", "")
 
     if mensaje in ["hola", "buenas", "buenos días", "buenas tardes", "inicio"]:
         return jsonify({"respuesta": (
@@ -94,8 +95,7 @@ def webhook():
     if "🔍 No encontré" not in respuesta_plan:
         return jsonify({"respuesta": respuesta_plan})
 
-    return jsonify({"respuesta": "🤖 No entendí tu mensaje. Por favor escribe el nombre de un plan o servicio correctamente y si lo hicistes de manera correcta es posible que en estos momentos ese plan se encuentre en modificaciones."})
+    return jsonify({"respuesta": "🤖 No entendí tu mensaje. Por favor escribe el nombre de un plan o servicio correctamente y si lo hiciste de manera correcta es posible que en estos momentos ese plan se encuentre en modificaciones."})
 
 if __name__ == "__main__":
     app.run(debug=True)
-    
