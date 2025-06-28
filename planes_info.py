@@ -1,7 +1,7 @@
 
 planes_info = {
     "crédito de necesidad inmediata": (
-        "💳 *Crédito de Necesidad Inmediata*
+        "💳 *Crédito de Necesidad Inmediata*"
 
 "
         "Permite hacer uso inmediato del servicio funerario requerido.
