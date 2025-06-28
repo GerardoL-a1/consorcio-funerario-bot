@@ -6,8 +6,8 @@ import requests
 app = Flask(__name__)
 
 NUMERO_REENVIO = "+525523604519"
-TWILIO_MESSAGING_URL = "https://api.twilio.com/2010-04-01/Accounts/YOUR_ACCOUNT_SID/Messages.json"
-TWILIO_AUTH = ("YOUR_ACCOUNT_SID", "YOUR_AUTH_TOKEN")
+TWILIO_MESSAGING_URL = "https://api.twilio.com/2010-04-01/Accounts/AC2ebbbb56dde3f32650225d802cd993fb7/Messages.json"
+TWILIO_AUTH = ("AC2ebbbb56dde3f32650225d802cd993fb7", "923d6dee710839a29f1079e710e37fe4")
 
 def contiene_emergencia(mensaje):
     claves = ["fallecido", "suceso", "ubicación", "contacto"]
