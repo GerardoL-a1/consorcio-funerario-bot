@@ -1,3 +1,4 @@
+
 from flask import Flask, request, jsonify
 from planes_info import planes_info, responder_plan
 import requests
@@ -20,7 +21,7 @@ def webhook():
 
     if mensaje in ["hola", "buenas", "buenos días", "buenas tardes", "inicio"]:
         return jsonify({"respuesta": (
-            "👋 *Bienvenido a Consorcio Funerario*\n"
+            "👋 *Bienvenido a Consorcio Funerario*\n\n"
             "Por favor selecciona una opción para continuar:\n\n"
             "1️⃣ Planes y Servicios\n"
             "2️⃣ Emergencias\n"
@@ -30,9 +31,9 @@ def webhook():
 
     if mensaje == "1":
         return jsonify({"respuesta": (
-            "📋 *Planes y Servicios Disponibles*\n"
+            "📋 *Planes y Servicios Disponibles*\n\n"
             "Puedes consultar cualquiera de nuestros planes o servicios individuales.\n\n"
-            "🔹 Planes fijos:\n"
+            "🔹 *Planes fijos:*\n"
             "- crédito de necesidad inmediata\n"
             "- servicio paquete fetal cremación\n"
             "- servicio paquete sencillo sepultura\n"
@@ -48,7 +49,7 @@ def webhook():
             "- cremación amigo fiel\n"
             "- servicio paquete de cremación de restos áridos\n"
             "- preventa de nichos a temporalidad\n\n"
-            "🔹 Servicios individuales:\n"
+            "🔹 *Servicios individuales:*\n"
             "- traslado\n"
             "- ataúd\n"
             "- urna\n"
@@ -59,7 +60,7 @@ def webhook():
 
     if mensaje == "2":
         return jsonify({"respuesta": (
-            "🚨 *ATENCIÓN INMEDIATA*\n"
+            "🚨 *ATENCIÓN INMEDIATA*\n\n"
             "Por favor responde con los siguientes datos:\n\n"
             "🔹 Nombre completo del fallecido\n"
             "🔹 Suceso o causa del fallecimiento\n"
@@ -93,7 +94,8 @@ def webhook():
     if "🔍 No encontré" not in respuesta_plan:
         return jsonify({"respuesta": respuesta_plan})
 
-    return jsonify({"respuesta": "🤖 No entendí tu mensaje. Por favor escribe el nombre de un plan o servicio válido."})
+    return jsonify({"respuesta": "🤖 No entendí tu mensaje. Por favor escribe el nombre de un plan o servicio correctamente y si lo hicistes de manera correcta es posible que en estos momentos ese plan se encuentre en modificaciones."})
 
 if __name__ == "__main__":
     app.run(debug=True)
+    
