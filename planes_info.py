@@ -17,7 +17,7 @@ planes_info = {
     "servicio paquete sencillo sepultura": (
         "⚰️ *Paquete Sencillo Sepultura*\n"
         "Incluye:\n- Carroza desde hospital o domicilio.\n- Ataúd de madera tapizado.\n"
-        "- Vestido con ropa proporcionada por la familia.\n- Equipo de velación en domicilio.\n"
+        "- Vestido con ropa proporcionada por la familia.\n- Equipo de velación en domicilio (1 cristo, 4 candeleros, pedestal).\n"
         "- Trámite ante registro civil para boleta de inhumación.\n- Carroza al panteón.\n"
         "💰 Costo: $7,900.00 + IVA"
     ),
