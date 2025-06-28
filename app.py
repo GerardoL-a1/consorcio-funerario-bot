@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify
 from planes_info import planes_info, responder_plan
 import requests
@@ -79,11 +78,7 @@ def webhook():
         )})
 
     if contiene_emergencia(mensaje):
-        texto_alerta = (
-            f"📨 *NUEVA EMERGENCIA*\n"
-            f"Mensaje: {mensaje}\n"
-            f"Desde: {telefono_cliente}"
-        )
+        texto_alerta = f"📨 *NUEVA EMERGENCIA*\nMensaje: {mensaje}\nDesde: {telefono_cliente}"
         requests.post(
             TWILIO_MESSAGING_URL,
             auth=TWILIO_AUTH,
