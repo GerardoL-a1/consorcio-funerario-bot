@@ -16,7 +16,7 @@ def contiene_emergencia(mensaje):
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.get_json()
-    mensaje = data.get("mensaje", "").lower()
+    mensaje = data.get("body", "").lower()
     telefono_cliente = data.get("from", "")
 
     if mensaje in ["hola", "buenas", "buenos días", "buenas tardes", "inicio"]:
