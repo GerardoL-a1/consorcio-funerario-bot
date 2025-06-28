@@ -4,35 +4,21 @@ planes_info = {
         "💳 *Crédito de Necesidad Inmediata*\n"
         "Permite hacer uso inmediato del servicio funerario requerido.\n"
         "✅ Requisitos: Comprobante de domicilio y credencial de elector con el mismo domicilio.\n"
-        "💰 Aportaciones:\n"
-        "- 50% del valor del servicio como pago inicial.\n"
-        "- 50% restante en 20 días.\n"
+        "💰 Aportaciones:\n- 50% del valor del servicio como pago inicial.\n- 50% restante en 20 días.\n"
         "- $60.00 pesos diarios por cada $1,000.00\n"
-        "🛡️ Garantías:\n"
-        "- Empresa 100% mexicana con 28 años.\n"
-        "- Autorizado por PROFECO.\n"
-        "- Servicio 24/7 en todo México."
+        "🛡️ Garantías:\n- Empresa 100% mexicana con 28 años.\n- Autorizado por PROFECO.\n- Servicio 24/7 en todo México."
     ),
     "servicio paquete fetal cremación": (
         "⚰️ *Paquete Fetal Cremación*\n"
-        "Incluye:\n"
-        "- Carroza para recolección del cuerpo desde hospital.\n"
-        "- Ataúd fetal especial.\n"
-        "- Traslado a crematorio autorizado.\n"
-        "- Servicio de cremación.\n"
-        "- Urna básica para entrega de cenizas.\n"
-        "💰 Costo: $5,800.00 + IVA\n"
-        "🛡️ Garantías: Empresa con 28 años, autorizado por PROFECO, cobertura nacional 24/7."
+        "Incluye:\n- Carroza para recolección del cuerpo desde hospital.\n- Ataúd fetal especial.\n"
+        "- Traslado a crematorio autorizado.\n- Servicio de cremación.\n- Urna básica para entrega de cenizas.\n"
+        "💰 Costo: $5,800.00 + IVA\n🛡️ Garantías: Empresa con 28 años, autorizado por PROFECO, cobertura nacional 24/7."
     ),
     "servicio paquete sencillo sepultura": (
         "⚰️ *Paquete Sencillo Sepultura*\n"
-        "Incluye:\n"
-        "- Carroza desde hospital o domicilio.\n"
-        "- Ataúd de madera tapizado.\n"
-        "- Vestido con ropa proporcionada por la familia.\n"
-        "- Equipo de velación en domicilio (1 cristo, 4 candeleros, pedestal).\n"
-        "- Trámite ante registro civil para boleta de inhumación.\n"
-        "- Carroza al panteón.\n"
+        "Incluye:\n- Carroza desde hospital o domicilio.\n- Ataúd de madera tapizado.\n"
+        "- Vestido con ropa proporcionada por la familia.\n- Equipo de velación en domicilio.\n"
+        "- Trámite ante registro civil para boleta de inhumación.\n- Carroza al panteón.\n"
         "💰 Costo: $7,900.00 + IVA"
     ),
     "servicio paquete básico sepultura": (
@@ -104,7 +90,8 @@ planes_info = {
 }
 
 def responder_plan(mensaje):
+    mensaje = mensaje.lower()
     for clave, texto in planes_info.items():
         if clave in mensaje:
             return texto
-    return "🔍 No encontré información sobre ese plan o servicio. Por favor intenta con otro nombre."
+    return "🤖 No entendí tu mensaje. Por favor escribe el nombre de un plan o servicio correctamente y si lo hicistes de manera correcta es posible que en estos momentos ese plan se encuentre en modificaciones."
