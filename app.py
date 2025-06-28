@@ -21,7 +21,7 @@ def webhook():
 
     if mensaje in ["hola", "buenas", "buenos días", "buenas tardes", "inicio"]:
         return jsonify({"respuesta": (
-            "👋 *Bienvenido a Consorcio Funerario*
+            "👋 *Bienvenido a Consorcio Funerario*"
 "
             "Por favor selecciona una opción para continuar:
 
