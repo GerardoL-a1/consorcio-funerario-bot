@@ -21,114 +21,69 @@ def webhook():
 
     if mensaje in ["hola", "buenas", "buenos días", "buenas tardes", "inicio"]:
         return jsonify({"respuesta": (
-            "👋 *Bienvenido a Consorcio Funerario*"
-"
-            "Por favor selecciona una opción para continuar:
-
-"
-            "1️⃣ Planes y Servicios
-"
-            "2️⃣ Emergencias
-"
-            "3️⃣ Ubicaciones
-
-"
+            "👋 *Bienvenido a Consorcio Funerario*\n"
+            "Por favor selecciona una opción para continuar:\n\n"
+            "1️⃣ Planes y Servicios\n"
+            "2️⃣ Emergencias\n"
+            "3️⃣ Ubicaciones\n\n"
             "_Responde con el número de la opción que deseas._"
         )})
 
     if mensaje == "1":
         return jsonify({"respuesta": (
-            "📋 *Planes y Servicios Disponibles*
-"
-            "Puedes consultar cualquiera de nuestros planes o servicios individuales.
-
-"
-            "🔹 Planes fijos:
-"
-            "- crédito de necesidad inmediata
-"
-            "- servicio paquete fetal cremación
-"
-            "- servicio paquete sencillo sepultura
-"
-            "- servicio paquete básico sepultura
-"
-            "- servicio cremación directa
-"
-            "- servicio paquete de cremación
-"
-            "- servicio paquete legal
-"
-            "- servicio de refrigeración y conservación
-"
-            "- red biker
-"
-            "- red plus
-"
-            "- red consorcio
-"
-            "- red adulto mayor
-"
-            "- cremación amigo fiel
-"
-            "- servicio paquete de cremación de restos áridos
-"
-            "- preventa de nichos a temporalidad
-
-"
-            "🔹 Servicios individuales:
-"
-            "- traslado
-"
-            "- ataúd
-"
-            "- urna
-"
-            "- velación
-"
-            "- boletas
-
-"
+            "📋 *Planes y Servicios Disponibles*\n"
+            "Puedes consultar cualquiera de nuestros planes o servicios individuales.\n\n"
+            "🔹 Planes fijos:\n"
+            "- crédito de necesidad inmediata\n"
+            "- servicio paquete fetal cremación\n"
+            "- servicio paquete sencillo sepultura\n"
+            "- servicio paquete básico sepultura\n"
+            "- servicio cremación directa\n"
+            "- servicio paquete de cremación\n"
+            "- servicio paquete legal\n"
+            "- servicio de refrigeración y conservación\n"
+            "- red biker\n"
+            "- red plus\n"
+            "- red consorcio\n"
+            "- red adulto mayor\n"
+            "- cremación amigo fiel\n"
+            "- servicio paquete de cremación de restos áridos\n"
+            "- preventa de nichos a temporalidad\n\n"
+            "🔹 Servicios individuales:\n"
+            "- traslado\n"
+            "- ataúd\n"
+            "- urna\n"
+            "- velación\n"
+            "- boletas\n\n"
             "✍️ Escribe el nombre del plan o servicio para más información."
         )})
 
     if mensaje == "2":
         return jsonify({"respuesta": (
-            "🚨 *ATENCIÓN INMEDIATA*
-"
-            "Por favor responde con los siguientes datos:
-
-"
-            "🔹 Nombre completo del fallecido
-"
-            "🔹 Suceso o causa del fallecimiento
-"
-            "🔹 Ubicación actual del cuerpo
-"
-            "🔹 Dos números de contacto
-
-"
+            "🚨 *ATENCIÓN INMEDIATA*\n"
+            "Por favor responde con los siguientes datos:\n\n"
+            "🔹 Nombre completo del fallecido\n"
+            "🔹 Suceso o causa del fallecimiento\n"
+            "🔹 Ubicación actual del cuerpo\n"
+            "🔹 Dos números de contacto\n\n"
             "📨 Esta información será enviada automáticamente a nuestro personal de atención."
         )})
 
     if mensaje == "3":
         return jsonify({"respuesta": (
-            "📍 *Ubicaciones de atención presencial:*
-"
-            "1. Av. Tláhuac No. 5502, Col. El Rosario, CDMX
-"
-            "2. Av. Zacatlán No. 60, Col. San Lorenzo Tezonco, CDMX
-"
-            "3. Av. Zacatlán No. 10, Col. San Lorenzo Tezonco, CDMX
-
-"
+            "📍 *Ubicaciones de atención presencial:*\n\n"
+            "1. Av. Tláhuac No. 5502, Col. El Rosario, CDMX\n"
+            "2. Av. Zacatlán No. 60, Col. San Lorenzo Tezonco, CDMX\n"
+            "3. Av. Zacatlán No. 10, Col. San Lorenzo Tezonco, CDMX\n\n"
             "¿Deseas que un asesor te contacte para agendar una cita? (Sí/No)"
         )})
 
     if contiene_emergencia(mensaje):
-        texto_alerta = f"📨 *NUEVA EMERGENCIA*
-Mensaje: {mensaje}
-Desde: {telefono_cliente}"
+        texto_alerta = (
+            f"📨 *NUEVA EMERGENCIA*\n"
+            f"Mensaje: {mensaje}\n"
+            f"Desde: {telefono_cliente}"
+        )
         requests.post(
             TWILIO_MESSAGING_URL,
             auth=TWILIO_AUTH,
