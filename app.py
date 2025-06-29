@@ -1,12 +1,12 @@
 
-from flask import Flask, request, jsonify
-from planes_info import planes_info, responder_plan
+from flask import Flask, request, Response
+from planes_info import responder_plan
 import requests
 import os
 
 app = Flask(__name__)
 
-# Claves seguras desde variables de entorno
+# Variables de entorno
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_MESSAGING_URL = f"https://api.twilio.com/2010-04-01/Accounts/{TWILIO_ACCOUNT_SID}/Messages.json"
@@ -32,11 +32,15 @@ def webhook():
     mensaje = request.form.get("Body", "").strip().lower()
     telefono_cliente = request.form.get("From", "")
 
+    # Función para enviar respuesta en texto plano
+    def responder(texto):
+        return Response(texto, mimetype="text/plain")
+
     if mensaje in ["hola", "buenas", "buenos días", "buenas tardes", "inicio"]:
-        return jsonify({"respuesta": MENSAJE_BIENVENIDA})
+        return responder(MENSAJE_BIENVENIDA)
 
     if mensaje == "1":
-        return jsonify({"respuesta": (
+        return responder(
             "📋 *Planes y Servicios Disponibles*\n\n"
             "Puedes consultar cualquiera de nuestros planes o servicios individuales.\n\n"
             "🔹 *Planes fijos:*\n"
@@ -62,10 +66,10 @@ def webhook():
             "- velación\n"
             "- boletas\n\n"
             "✍️ Escribe el nombre del plan o servicio para más información."
-        )})
+        )
 
     if mensaje == "2":
-        return jsonify({"respuesta": (
+        return responder(
             "🚨 *ATENCIÓN INMEDIATA*\n\n"
             "Por favor responde con los siguientes datos:\n\n"
             "🔹 Nombre completo del fallecido\n"
@@ -73,18 +77,18 @@ def webhook():
             "🔹 Ubicación actual del cuerpo\n"
             "🔹 Dos números de contacto\n\n"
             "📨 Esta información será enviada automáticamente a nuestro personal de atención."
-        )})
+        )
 
     if mensaje == "3":
-        return jsonify({"respuesta": (
+        return responder(
             "📍 *Ubicaciones de atención presencial:*\n\n"
             "1. Av. Tláhuac No. 5502, Col. El Rosario, CDMX\n"
             "2. Av. Zacatlán No. 60, Col. San Lorenzo Tezonco, CDMX\n"
             "3. Av. Zacatlán No. 10, Col. San Lorenzo Tezonco, CDMX\n\n"
             "¿Deseas que un asesor te contacte para agendar una cita? (Sí/No)"
-        )})
+        )
 
-    # 🔴 Lógica de emergencia + reenvío
+    # Emergencia con reenvío
     if contiene_emergencia(mensaje):
         texto_alerta = f"📨 *NUEVA EMERGENCIA*\nMensaje: {mensaje}\nDesde: {telefono_cliente}"
         try:
@@ -98,20 +102,19 @@ def webhook():
                 }
             )
         except Exception as e:
-            print("Error al reenviar mensaje de emergencia:", str(e))
+            print("❌ Error al reenviar mensaje de emergencia:", str(e))
 
-    # 🔎 Revisión de palabra clave para planes o servicios
+    # Revisión de plan
     respuesta_plan = responder_plan(mensaje)
     if "🔍 No encontré" not in respuesta_plan:
-        return jsonify({"respuesta": respuesta_plan})
+        return responder(respuesta_plan)
 
-    # ❌ Si no se encuentra el plan ni hay coincidencias
-    return jsonify({"respuesta": (
+    # Por defecto
+    return responder(
         "🤖 No entendí tu mensaje. Por favor escribe el nombre de un plan o servicio correctamente "
         "y si lo hiciste de manera correcta es posible que en estos momentos ese plan se encuentre en modificaciones."
-    )})
+    )
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-    
