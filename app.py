@@ -13,68 +13,71 @@ def contiene_emergencia(mensaje):
     claves = ["fallecido", "suceso", "ubicación", "contacto"]
     return sum(p in mensaje for p in claves) >= 3
 
-# Respuesta base para todos los mensajes
-def respuesta_bienvenida():
-    return (
-        "👋 *Bienvenido a Consorcio Funerario*\n\n"
-        "Por favor selecciona una opción para continuar:\n\n"
-        "1️⃣ Planes y Servicios\n"
-        "2️⃣ Emergencias\n"
-        "3️⃣ Ubicaciones\n\n"
-        "_Responde con el número de la opción que deseas._"
-    )
-
 @app.route("/webhook", methods=["POST"])
 def webhook():
-    data = request.form.to_dict()
+    data = request.get_json()
     mensaje = data.get("mensaje", "").lower()
     telefono_cliente = data.get("from", "")
 
-    respuesta = respuesta_bienvenida()
+    if mensaje in ["hola", "buenas", "buenos días", "buenas tardes", "inicio"]:
+        return jsonify({"respuesta": (
+            "👋 *Bienvenido a Consorcio Funerario*\n\n"
+            "Por favor selecciona una opción para continuar:\n\n"
+            "1️⃣ Planes y Servicios\n"
+            "2️⃣ Emergencias\n"
+            "3️⃣ Ubicaciones\n\n"
+            "_Responde con el número de la opción que deseas._"
+        )})
 
     if mensaje == "1":
-        respuesta += "\n\n📋 *Planes y Servicios Disponibles*\n\n" \
-                     "🔹 *Planes fijos:*\n" \
-                     "- crédito de necesidad inmediata\n" \
-                     "- servicio paquete fetal cremación\n" \
-                     "- servicio paquete sencillo sepultura\n" \
-                     "- servicio paquete básico sepultura\n" \
-                     "- servicio cremación directa\n" \
-                     "- servicio paquete de cremación\n" \
-                     "- servicio paquete legal\n" \
-                     "- servicio de refrigeración y conservación\n" \
-                     "- red biker\n" \
-                     "- red plus\n" \
-                     "- red consorcio\n" \
-                     "- red adulto mayor\n" \
-                     "- cremación amigo fiel\n" \
-                     "- servicio paquete de cremación de restos áridos\n" \
-                     "- preventa de nichos a temporalidad\n\n" \
-                     "🔹 *Servicios individuales:*\n" \
-                     "- traslado\n" \
-                     "- ataúd\n" \
-                     "- urna\n" \
-                     "- velación\n" \
-                     "- boletas\n\n" \
-                     "✍️ Escribe el nombre del plan o servicio para más información."
+        return jsonify({"respuesta": (
+            "📋 *Planes y Servicios Disponibles*\n\n"
+            "Puedes consultar cualquiera de nuestros planes o servicios individuales.\n\n"
+            "🔹 *Planes fijos:*\n"
+            "- crédito de necesidad inmediata\n"
+            "- servicio paquete fetal cremación\n"
+            "- servicio paquete sencillo sepultura\n"
+            "- servicio paquete básico sepultura\n"
+            "- servicio cremación directa\n"
+            "- servicio paquete de cremación\n"
+            "- servicio paquete legal\n"
+            "- servicio de refrigeración y conservación\n"
+            "- red biker\n"
+            "- red plus\n"
+            "- red consorcio\n"
+            "- red adulto mayor\n"
+            "- cremación amigo fiel\n"
+            "- servicio paquete de cremación de restos áridos\n"
+            "- preventa de nichos a temporalidad\n\n"
+            "🔹 *Servicios individuales:*\n"
+            "- traslado\n"
+            "- ataúd\n"
+            "- urna\n"
+            "- velación\n"
+            "- boletas\n\n"
+            "✍️ Escribe el nombre del plan o servicio para más información."
+        )})
 
-    elif mensaje == "2":
-        respuesta += "\n\n🚨 *ATENCIÓN INMEDIATA*\n\n" \
-                     "Por favor responde con los siguientes datos:\n\n" \
-                     "🔹 Nombre completo del fallecido\n" \
-                     "🔹 Suceso o causa del fallecimiento\n" \
-                     "🔹 Ubicación actual del cuerpo\n" \
-                     "🔹 Dos números de contacto\n\n" \
-                     "📨 Esta información será enviada automáticamente a nuestro personal de atención."
+    if mensaje == "2":
+        return jsonify({"respuesta": (
+            "🚨 *ATENCIÓN INMEDIATA*\n\n"
+            "Por favor responde con los siguientes datos:\n\n"
+            "🔹 Nombre completo del fallecido\n"
+            "🔹 Suceso o causa del fallecimiento\n"
+            "🔹 Ubicación actual del cuerpo\n"
+            "🔹 Dos números de contacto\n\n"
+            "📨 Esta información será enviada automáticamente a nuestro personal de atención."
+        )})
 
-    elif mensaje == "3":
-        respuesta += "\n\n📍 *Ubicaciones de atención presencial:*\n\n" \
-                     "1. Av. Tláhuac No. 5502, Col. El Rosario, CDMX\n" \
-                     "2. Av. Zacatlán No. 60, Col. San Lorenzo Tezonco, CDMX\n" \
-                     "3. Av. Zacatlán No. 10, Col. San Lorenzo Tezonco, CDMX\n\n" \
-                     "¿Deseas que un asesor te contacte para agendar una cita? (Sí/No)"
+    if mensaje == "3":
+        return jsonify({"respuesta": (
+            "📍 *Ubicaciones de atención presencial:*\n\n"
+            "1. Av. Tláhuac No. 5502, Col. El Rosario, CDMX\n"
+            "2. Av. Zacatlán No. 60, Col. San Lorenzo Tezonco, CDMX\n"
+            "3. Av. Zacatlán No. 10, Col. San Lorenzo Tezonco, CDMX\n\n"
+            "¿Deseas que un asesor te contacte para agendar una cita? (Sí/No)"
+        )})
 
-    # Reenvío automático si es emergencia
     if contiene_emergencia(mensaje):
         texto_alerta = f"📨 *NUEVA EMERGENCIA*\nMensaje: {mensaje}\nDesde: {telefono_cliente}"
         requests.post(
@@ -87,12 +90,11 @@ def webhook():
             }
         )
 
-    # Checar si el mensaje coincide con un plan
     respuesta_plan = responder_plan(mensaje)
     if "🔍 No encontré" not in respuesta_plan:
-        respuesta += f"\n\n📄 *Información del plan solicitado:*\n{respuesta_plan}"
+        return jsonify({"respuesta": respuesta_plan})
 
-    return jsonify({"respuesta": respuesta})
+    return jsonify({"respuesta": "🤖 No entendí tu mensaje. Por favor escribe el nombre de un plan o servicio correctamente y si lo hicistes de manera correcta es posible que en estos momentos ese plan se encuentre en modificaciones."})
 
 if __name__ == "__main__":
     app.run(debug=True)
