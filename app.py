@@ -26,7 +26,7 @@ def respuesta_bienvenida():
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
-    data = request.get_json()
+    data = request.form.to_dict()
     mensaje = data.get("mensaje", "").lower()
     telefono_cliente = data.get("from", "")
 
