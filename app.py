@@ -2,12 +2,26 @@
 from flask import Flask, request, jsonify
 from planes_info import planes_info, responder_plan
 import requests
+import os
 
 app = Flask(__name__)
 
+# Claves seguras desde variables de entorno
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+TWILIO_MESSAGING_URL = f"https://api.twilio.com/2010-04-01/Accounts/{TWILIO_ACCOUNT_SID}/Messages.json"
+TWILIO_AUTH = (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+
 NUMERO_REENVIO = "+525523604519"
-TWILIO_MESSAGING_URL = "https://api.twilio.com/2010-04-01/Accounts/AC2ebbbb56dde3f32650225d802cd993fb7/Messages.json"
-TWILIO_AUTH = ("AC2ebbbb56dde3f32650225d802cd993fb7", "923d6dee710839a29f1079e710e37fe4")
+
+MENSAJE_BIENVENIDA = (
+    "👋 *Bienvenido a Consorcio Funerario*\n\n"
+    "Por favor selecciona una opción para continuar:\n\n"
+    "1️⃣ Planes y Servicios\n"
+    "2️⃣ Emergencias\n"
+    "3️⃣ Ubicaciones\n\n"
+    "_Responde con el número de la opción que deseas._"
+)
 
 def contiene_emergencia(mensaje):
     claves = ["fallecido", "suceso", "ubicación", "contacto"]
@@ -15,19 +29,11 @@ def contiene_emergencia(mensaje):
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
-    data = request.get_json()
-    mensaje = data.get("mensaje", "").lower()
-    telefono_cliente = data.get("from", "")
+    mensaje = request.form.get("Body", "").strip().lower()
+    telefono_cliente = request.form.get("From", "")
 
     if mensaje in ["hola", "buenas", "buenos días", "buenas tardes", "inicio"]:
-        return jsonify({"respuesta": (
-            "👋 *Bienvenido a Consorcio Funerario*\n\n"
-            "Por favor selecciona una opción para continuar:\n\n"
-            "1️⃣ Planes y Servicios\n"
-            "2️⃣ Emergencias\n"
-            "3️⃣ Ubicaciones\n\n"
-            "_Responde con el número de la opción que deseas._"
-        )})
+        return jsonify({"respuesta": MENSAJE_BIENVENIDA})
 
     if mensaje == "1":
         return jsonify({"respuesta": (
@@ -78,23 +84,34 @@ def webhook():
             "¿Deseas que un asesor te contacte para agendar una cita? (Sí/No)"
         )})
 
+    # 🔴 Lógica de emergencia + reenvío
     if contiene_emergencia(mensaje):
         texto_alerta = f"📨 *NUEVA EMERGENCIA*\nMensaje: {mensaje}\nDesde: {telefono_cliente}"
-        requests.post(
-            TWILIO_MESSAGING_URL,
-            auth=TWILIO_AUTH,
-            data={
-                "To": NUMERO_REENVIO,
-                "From": "whatsapp:+14155238886",
-                "Body": texto_alerta
-            }
-        )
+        try:
+            requests.post(
+                TWILIO_MESSAGING_URL,
+                auth=TWILIO_AUTH,
+                data={
+                    "To": NUMERO_REENVIO,
+                    "From": "whatsapp:+14155238886",
+                    "Body": texto_alerta
+                }
+            )
+        except Exception as e:
+            print("Error al reenviar mensaje de emergencia:", str(e))
 
+    # 🔎 Revisión de palabra clave para planes o servicios
     respuesta_plan = responder_plan(mensaje)
     if "🔍 No encontré" not in respuesta_plan:
         return jsonify({"respuesta": respuesta_plan})
 
-    return jsonify({"respuesta": "🤖 No entendí tu mensaje. Por favor escribe el nombre de un plan o servicio correctamente y si lo hicistes de manera correcta es posible que en estos momentos ese plan se encuentre en modificaciones."})
+    # ❌ Si no se encuentra el plan ni hay coincidencias
+    return jsonify({"respuesta": (
+        "🤖 No entendí tu mensaje. Por favor escribe el nombre de un plan o servicio correctamente "
+        "y si lo hiciste de manera correcta es posible que en estos momentos ese plan se encuentre en modificaciones."
+    )})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.getenv("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+    
