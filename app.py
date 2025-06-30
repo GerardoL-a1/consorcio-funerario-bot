@@ -17,7 +17,7 @@ NUMERO_REENVIO = "+525523604519"
 sesiones = {}
 
 MENSAJE_BIENVENIDA = (
-    "👋 *Bienvenido a Consorcio Funerario*
+    "👋 *Bienvenido a Consorcio Funerario*"
 
 "
     "Por favor selecciona una opción para continuar:
