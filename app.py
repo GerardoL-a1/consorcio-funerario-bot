@@ -17,6 +17,11 @@ NUMERO_REENVIO = "+525523604519"
 # Estados de sesión por número
 sesiones = {}
 
+# Ruta raíz para evitar errores 404
+@app.route("/", methods=["GET"])
+def home():
+    return "✅ Consorcio Funerario Bot está corriendo correctamente."
+
 MENSAJE_BIENVENIDA = (
     "👋 *Bienvenido a Consorcio Funerario*\n\n"
     "Por favor selecciona una opción para continuar:\n"
@@ -167,4 +172,5 @@ def webhook():
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port
+    
