@@ -13,15 +13,14 @@ TWILIO_MESSAGING_URL = f"https://api.twilio.com/2010-04-01/Accounts/{TWILIO_ACCO
 TWILIO_AUTH = (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 NUMERO_REENVIO = "+525523604519"
-
-# Estados de sesión por número
 sesiones = {}
 
-# Ruta raíz para evitar errores 404
+# ✅ Ruta raíz para evitar error 404 en Render
 @app.route("/", methods=["GET"])
 def home():
     return "✅ Consorcio Funerario Bot está corriendo correctamente."
 
+# ✅ Bienvenida sin errores de paréntesis
 MENSAJE_BIENVENIDA = (
     "👋 *Bienvenido a Consorcio Funerario*\n\n"
     "Por favor selecciona una opción para continuar:\n"
@@ -44,7 +43,7 @@ def webhook():
         sesiones[telefono] = {}
         return jsonify({"respuesta": MENSAJE_BIENVENIDA})
 
-    # MENÚ PRINCIPAL
+    # Menú principal
     if mensaje == "1":
         sesiones[telefono] = {"menu": "planes"}
         return jsonify({"respuesta": (
@@ -115,7 +114,7 @@ def webhook():
         except (ValueError, IndexError):
             return jsonify({"respuesta": "❌ Opción no válida. Intenta nuevamente con un número correcto."})
 
-    # ATENCIÓN A EMERGENCIAS
+    # Emergencias
     if mensaje == "2":
         return jsonify({"respuesta": (
             "🚨 *ATENCIÓN INMEDIATA*\n\n"
@@ -135,7 +134,7 @@ def webhook():
             "Body": alerta
         })
 
-    # UBICACIONES
+    # Ubicaciones
     if mensaje == "3":
         sesiones[telefono] = {"menu": "ubicacion"}
         return jsonify({"respuesta": (
@@ -165,12 +164,12 @@ def webhook():
         sesiones[telefono] = {}
         return jsonify({"respuesta": "✅ Gracias. Hemos registrado tu solicitud. Nuestro equipo te contactará pronto."})
 
-    # RESPUESTA GENERAL
+    # Mensaje genérico si no coincide con nada
     return jsonify({"respuesta": (
         "🤖 No entendí tu mensaje. Escribe 'hola' para comenzar de nuevo o selecciona una opción del menú principal."
     )})
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
-    app.run(host="0.0.0.0", port=port
+    app.run(host="0.0.0.0", port=port)
     
