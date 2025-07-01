@@ -46,15 +46,13 @@ def webhook():
     telefono = request.form.get("From", "")
     estado = sesiones.get(telefono, {})
 
-    # Bienvenida automática si no hay sesión
+    # Mostrar bienvenida solo si NO hay sesión activa Y el mensaje no es una opción válida
     if telefono not in sesiones or not sesiones[telefono]:
-        if any(p in mensaje for p in contacto) or mensaje:
+        if mensaje not in ["1", "2", "3"]:
             sesiones[telefono] = {}
-        return responder(MENSAJE_BIENVENIDA)
+            return responder(MENSAJE_BIENVENIDA)
 
     if mensaje == "1":
-        if estado.get("menu") == "planes":
-            return responder("📋 Ya estás viendo los *Planes y Servicios*. Elige una categoría:\n1. Necesidad inmediata\n2. A futuro\n3. Servicios individuales")
         sesiones[telefono] = {"menu": "planes"}
         return responder(
             "📋 *Selecciona una categoría:*\n"
@@ -65,7 +63,7 @@ def webhook():
 
     if estado.get("menu") == "planes":
         if mensaje == "1":
-            sesiones[telefono] = {"menu": "planes", "submenu": "inmediato"}
+            sesiones[telefono]["submenu"] = "inmediato"
             return responder(
                 "⏱️ *Planes de necesidad inmediata:*\n"
                 "1. Crédito de necesidad inmediata\n"
@@ -79,7 +77,7 @@ def webhook():
                 "Responde con el número del plan para ver detalles."
             )
         elif mensaje == "2":
-            sesiones[telefono] = {"menu": "planes", "submenu": "futuro"}
+            sesiones[telefono]["submenu"] = "futuro"
             return responder(
                 "🕰️ *Planes a futuro:*\n"
                 "1. Red Biker\n"
@@ -90,7 +88,7 @@ def webhook():
                 "Responde con el número del plan para ver detalles."
             )
         elif mensaje == "3":
-            sesiones[telefono] = {"menu": "planes", "submenu": "servicios"}
+            sesiones[telefono]["submenu"] = "servicios"
             return responder(
                 "🧰 *Servicios individuales:*\n"
                 "1. Traslado\n"
@@ -101,7 +99,7 @@ def webhook():
                 "Responde con el número del servicio para ver detalles."
             )
 
-    # Manejo de selección por número mientras está activo el submenu
+    # Selección por número dentro del submenu
     submenu = estado.get("submenu")
     if submenu:
         categorias = {
@@ -180,7 +178,7 @@ def webhook():
         sesiones[telefono] = {}
         return responder("✅ Gracias. Hemos registrado tu solicitud. Nuestro equipo te contactará pronto.")
 
-    # Último recurso: búsqueda directa de plan por texto libre
+    # Intento final: búsqueda directa por palabra clave
     posible = responder_plan(mensaje)
     if posible:
         return responder(posible)
