@@ -1,12 +1,13 @@
 
-from flask import Flask, request, jsonify
+from flask import Flask, request
+from twilio.twiml.messaging_response import MessagingResponse
 from planes_info import responder_plan
 import requests
 import os
 
 app = Flask(__name__)
 
-# Claves seguras desde variables de entorno
+# Claves desde variables de entorno
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_MESSAGING_URL = f"https://api.twilio.com/2010-04-01/Accounts/{TWILIO_ACCOUNT_SID}/Messages.json"
@@ -15,12 +16,10 @@ TWILIO_AUTH = (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 NUMERO_REENVIO = "+525523604519"
 sesiones = {}
 
-# ✅ Ruta raíz para evitar error 404 en Render
 @app.route("/", methods=["GET"])
 def home():
-    return "✅ Consorcio Funerario Bot está corriendo correctamente."
+    return "✅ Bot Consorcio Funerario funcionando."
 
-# ✅ Bienvenida sin errores de paréntesis
 MENSAJE_BIENVENIDA = (
     "👋 *Bienvenido a Consorcio Funerario*\n\n"
     "Por favor selecciona una opción para continuar:\n"
@@ -33,6 +32,11 @@ def contiene_emergencia(mensaje):
     claves = ["fallecido", "suceso", "ubicación", "contacto"]
     return sum(p in mensaje for p in claves) >= 3
 
+def responder(texto):
+    respuesta = MessagingResponse()
+    respuesta.message(texto)
+    return str(respuesta)
+
 @app.route("/webhook", methods=["POST"])
 def webhook():
     mensaje = request.form.get("Body", "").strip().lower()
@@ -41,22 +45,21 @@ def webhook():
 
     if mensaje in ["hola", "inicio", "empezar", "buenas"]:
         sesiones[telefono] = {}
-        return jsonify({"respuesta": MENSAJE_BIENVENIDA})
+        return responder(MENSAJE_BIENVENIDA)
 
-    # Menú principal
     if mensaje == "1":
         sesiones[telefono] = {"menu": "planes"}
-        return jsonify({"respuesta": (
+        return responder(
             "📋 *Selecciona una categoría:*\n"
             "1. Planes de necesidad inmediata\n"
             "2. Planes a futuro\n"
             "3. Servicios individuales"
-        )})
+        )
 
     if estado.get("menu") == "planes":
         if mensaje == "1":
             sesiones[telefono] = {"submenu": "inmediato"}
-            return jsonify({"respuesta": (
+            return responder(
                 "⏱️ *Planes de necesidad inmediata:*\n"
                 "1. Crédito de necesidad inmediata\n"
                 "2. Servicio paquete fetal cremación\n"
@@ -67,10 +70,10 @@ def webhook():
                 "7. Servicio paquete legal\n"
                 "8. Servicio de refrigeración y conservación\n"
                 "Responde con el número del plan para más detalles."
-            )})
+            )
         elif mensaje == "2":
             sesiones[telefono] = {"submenu": "futuro"}
-            return jsonify({"respuesta": (
+            return responder(
                 "🕰️ *Planes a futuro:*\n"
                 "1. Red Biker\n"
                 "2. Red Plus\n"
@@ -78,10 +81,10 @@ def webhook():
                 "4. Red Adulto Mayor\n"
                 "5. Preventa de Nichos a Temporalidad\n"
                 "Responde con el número del plan para más detalles."
-            )})
+            )
         elif mensaje == "3":
             sesiones[telefono] = {"submenu": "servicios"}
-            return jsonify({"respuesta": (
+            return responder(
                 "🧰 *Servicios individuales:*\n"
                 "1. Traslado\n"
                 "2. Ataúd\n"
@@ -89,7 +92,7 @@ def webhook():
                 "4. Velación\n"
                 "5. Boletas\n"
                 "Responde con el número del servicio para más detalles."
-            )})
+            )
 
     if estado.get("submenu"):
         categorias = {
@@ -110,13 +113,12 @@ def webhook():
             index = int(mensaje) - 1
             plan = categorias[estado["submenu"]][index]
             respuesta = responder_plan(plan)
-            return jsonify({"respuesta": respuesta})
+            return responder(respuesta)
         except (ValueError, IndexError):
-            return jsonify({"respuesta": "❌ Opción no válida. Intenta nuevamente con un número correcto."})
+            return responder("❌ Opción no válida. Intenta nuevamente con un número correcto.")
 
-    # Emergencias
     if mensaje == "2":
-        return jsonify({"respuesta": (
+        return responder(
             "🚨 *ATENCIÓN INMEDIATA*\n\n"
             "Por favor responde con los siguientes datos:\n"
             "🔹 Nombre completo del fallecido\n"
@@ -124,7 +126,7 @@ def webhook():
             "🔹 Ubicación actual del cuerpo\n"
             "🔹 Dos números de contacto\n"
             "🔹 Nombre de la persona que nos está contactando"
-        )})
+        )
 
     if contiene_emergencia(mensaje):
         alerta = f"📨 *EMERGENCIA RECIBIDA*\nMensaje: {mensaje}\nDesde: {telefono}"
@@ -134,25 +136,24 @@ def webhook():
             "Body": alerta
         })
 
-    # Ubicaciones
     if mensaje == "3":
         sesiones[telefono] = {"menu": "ubicacion"}
-        return jsonify({"respuesta": (
+        return responder(
             "📍 *Ubicaciones disponibles:*\n"
             "1. Av. Tláhuac No. 5502, Col. El Rosario, CDMX\n"
             "2. Av. Zacatlán No. 60, Col. San Lorenzo Tezonco, CDMX\n"
             "3. Av. Zacatlán No. 10, Col. San Lorenzo Tezonco, CDMX\n\n"
             "¿Deseas agendar una cita en alguna de nuestras sucursales? (Sí / No)"
-        )})
+        )
 
     if estado.get("menu") == "ubicacion" and mensaje == "sí":
         sesiones[telefono] = {"menu": "cita"}
-        return jsonify({"respuesta": (
+        return responder(
             "📅 *Agendemos tu cita.*\n\n"
             "¿Qué día te gustaría visitarnos?\n"
             "¿En qué horario podrías acudir?\n\n"
             "Tu información será enviada a nuestro equipo."
-        )})
+        )
 
     if estado.get("menu") == "cita":
         aviso = f"📆 *CITA SOLICITADA*\nCliente: {telefono}\nDatos: {mensaje}"
@@ -162,12 +163,9 @@ def webhook():
             "Body": aviso
         })
         sesiones[telefono] = {}
-        return jsonify({"respuesta": "✅ Gracias. Hemos registrado tu solicitud. Nuestro equipo te contactará pronto."})
+        return responder("✅ Gracias. Hemos registrado tu solicitud. Nuestro equipo te contactará pronto.")
 
-    # Mensaje genérico si no coincide con nada
-    return jsonify({"respuesta": (
-        "🤖 No entendí tu mensaje. Escribe 'hola' para comenzar de nuevo o selecciona una opción del menú principal."
-    )})
+    return responder("🤖 No entendí tu mensaje. Escribe 'hola' para comenzar de nuevo o selecciona una opción del menú principal.")
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
