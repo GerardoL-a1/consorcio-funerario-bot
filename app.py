@@ -65,7 +65,7 @@ def webhook():
 
     if estado.get("menu") == "planes":
         if mensaje == "1":
-            sesiones[telefono] = {"submenu": "inmediato"}
+            sesiones[telefono] = {"menu": "planes", "submenu": "inmediato"}
             return responder(
                 "⏱️ *Planes de necesidad inmediata:*\n"
                 "1. Crédito de necesidad inmediata\n"
@@ -79,7 +79,7 @@ def webhook():
                 "Responde con el número del plan para ver detalles."
             )
         elif mensaje == "2":
-            sesiones[telefono] = {"submenu": "futuro"}
+            sesiones[telefono] = {"menu": "planes", "submenu": "futuro"}
             return responder(
                 "🕰️ *Planes a futuro:*\n"
                 "1. Red Biker\n"
@@ -90,7 +90,7 @@ def webhook():
                 "Responde con el número del plan para ver detalles."
             )
         elif mensaje == "3":
-            sesiones[telefono] = {"submenu": "servicios"}
+            sesiones[telefono] = {"menu": "planes", "submenu": "servicios"}
             return responder(
                 "🧰 *Servicios individuales:*\n"
                 "1. Traslado\n"
@@ -101,7 +101,9 @@ def webhook():
                 "Responde con el número del servicio para ver detalles."
             )
 
-    if estado.get("submenu"):
+    # Manejo de selección por número mientras está activo el submenu
+    submenu = estado.get("submenu")
+    if submenu:
         categorias = {
             "inmediato": [
                 "crédito de necesidad inmediata", "servicio paquete fetal cremación",
@@ -118,10 +120,10 @@ def webhook():
 
         try:
             index = int(mensaje) - 1
-            plan = categorias[estado["submenu"]][index]
+            plan = categorias[submenu][index]
             respuesta = responder_plan(plan)
             if respuesta:
-                return responder(respuesta)
+                return responder(respuesta + "\n\n📌 *¿Deseas consultar otro plan? Solo responde con otro número.*")
             else:
                 return responder("🤖 Por favor escribe el nombre de un plan o servicio correctamente y si lo hiciste de manera correcta es posible que en estos momentos ese plan se encuentre en modificaciones.")
         except (ValueError, IndexError):
@@ -178,7 +180,7 @@ def webhook():
         sesiones[telefono] = {}
         return responder("✅ Gracias. Hemos registrado tu solicitud. Nuestro equipo te contactará pronto.")
 
-    # Último recurso: buscar si mencionó directamente un plan o palabra clave válida
+    # Último recurso: búsqueda directa de plan por texto libre
     posible = responder_plan(mensaje)
     if posible:
         return responder(posible)
