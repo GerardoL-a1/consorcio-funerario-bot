@@ -1,9 +1,12 @@
 
+# Versión final de app.py para el bot de WhatsApp de Consorcio Funerario (actualizado con letras corregidas y listado completo de servicios individuales)
+
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 from planes_info import responder_plan
 import requests
 import os
+import re
 
 app = Flask(__name__)
 
@@ -21,26 +24,68 @@ def home():
 
 MENSAJE_BIENVENIDA = (
     "👋 *Bienvenido a Consorcio Funerario*\n\n"
-    "Por favor selecciona una opción para continuar:\n"
-    "1️⃣ Planes y Servicios\n"
-    "2️⃣ Emergencias\n"
-    "3️⃣ Ubicaciones"
+    "Gracias por escribirnos.\n\n"
+    "Por favor indíquenos *en qué podemos apoyarle o brindarle información*:\n"
+    "- Atención inmediata por *emergencia*\n"
+    "- Conocer nuestros *servicios funerarios*\n"
+    "- Consultar nuestras *ubicaciones disponibles*\n\n"
+    "📌 Puede escribir palabras como: *emergencia*, *planes*, *nichos*, *traslado*, *ubicación*, etc."
 )
 
-contacto = ["hola", "holaaa", "ola", "holis", "buenas", "buen día", "saludos", "info", "ayuda"]
-emergencia_claves = ["fallecido", "falleció", "murió", "hospital", "urgente", "emergencia", "traslado", "defunción"]
-comandos_menu = [
-    "menu", "menú", "meniu", "meenu", "men", "mn", "menuu", "inicio",
-    "volver", "volber", "volv", "volverr", "regresar", "inicioo", "volber al menu"
-]
+claves_planes = ["planes", "servicios", "funerarios", "plan", "sepultura", "cremacion", "legal", "biker", "plus", "consorcio", "adulto", "nichos", "fetal"]
+claves_emergencia = ["emergencia", "fallecido", "falleció", "murio", "hospital", "traslado", "recoleccion", "suceso", "defuncion"]
+claves_ubicacion = ["ubicación", "sucursal", "donde", "direccion", "ubicaciones", "están"]
+claves_menu = ["menú", "menu", "volver", "inicio", "regresar", "empezar"]
 
-def contiene_emergencia(mensaje):
-    return any(p in mensaje.lower() for p in emergencia_claves)
+submenus = {
+    "inmediato": {
+        "letras": list("ABCDEFGH"),
+        "planes": [
+            "crédito de necesidad inmediata", "servicio paquete fetal cremación",
+            "servicio paquete sencillo sepultura", "servicio paquete básico sepultura",
+            "servicio cremación directa", "servicio paquete de cremación",
+            "servicio paquete legal", "servicio de refrigeración y conservación"
+        ]
+    },
+    "futuro": {
+        "letras": list("IJKLM"),
+        "planes": [
+            "red biker", "red plus", "red consorcio",
+            "red adulto mayor", "preventa de nichos a temporalidad"
+        ]
+    },
+    "servicios": {
+        "letras": list("NOPQRSTUVWXYZ"),
+        "planes": [
+            "traslado", "ataúd", "urna", "velación", "boletas",
+            "carroza local", "carroza a panteón u horno crematorio", "carroza legal", "camión local",
+            "embalsamado", "embalsamado legal", "embalsamado infecto-contagiosa", "trámites de inhumación",
+            "trámites de cremación", "trámites legales", "trámites de traslado",
+            "trámites de internación nacional", "trámites de internación internacional",
+            "equipo de velación", "cirios", "capilla de gobierno", "capilla particular",
+            "traslado carretero por km", "traslado de terracería por km", "camión foráneo por km"
+        ]
+    }
+}
+
+def contiene(palabras, mensaje):
+    return any(p in mensaje.lower() for p in palabras)
+
+def normaliza(texto):
+    return re.sub(r"[^a-z0-9áéíóúñ ]", "", texto.lower())
+
+def buscar_plan_por_clave(mensaje):
+    mensaje = normaliza(mensaje)
+    for categoria in submenus.values():
+        for plan in categoria["planes"]:
+            if any(p in mensaje for p in plan.split()):
+                return responder_plan(plan)
+    return None
 
 def responder(texto):
-    res = MessagingResponse()
-    res.message(texto)
-    return str(res)
+    r = MessagingResponse()
+    r.message(texto)
+    return str(r)
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
@@ -48,113 +93,23 @@ def webhook():
     telefono = request.form.get("From", "")
     estado = sesiones.get(telefono, {})
 
-    # Comando para regresar al menú principal
-    if mensaje in comandos_menu:
+    if contiene(claves_menu, mensaje):
         sesiones[telefono] = {}
         return responder(MENSAJE_BIENVENIDA)
 
-    # Mostrar bienvenida si no hay flujo activo
     if "menu" not in estado:
-        if mensaje not in ["1", "2", "3"]:
+        if contiene(claves_emergencia, mensaje):
+            sesiones[telefono] = {"menu": "emergencia"}
+        elif contiene(claves_planes, mensaje):
+            sesiones[telefono] = {"menu": "planes"}
+        elif contiene(claves_ubicacion, mensaje):
+            sesiones[telefono] = {"menu": "ubicacion"}
+        else:
             sesiones[telefono] = {"menu": "principal"}
             return responder(MENSAJE_BIENVENIDA)
-        else:
-            sesiones[telefono] = {"menu": "principal"}
-
-    # Menú principal
-    if mensaje == "1":
-        sesiones[telefono] = {"menu": "planes"}
-        return responder(
-            "📋 *Selecciona una categoría:*\n"
-            "1. Planes de necesidad inmediata\n"
-            "2. Planes a futuro\n"
-            "3. Servicios individuales"
-        )
-
-    if estado.get("menu") == "planes":
-        if mensaje == "1":
-            sesiones[telefono]["submenu"] = "inmediato"
-            return responder(
-                "⏱️ *Planes de necesidad inmediata:*\n"
-                "A. Crédito de necesidad inmediata\n"
-                "B. Servicio paquete fetal cremación\n"
-                "C. Servicio paquete sencillo sepultura\n"
-                "D. Servicio paquete básico sepultura\n"
-                "E. Servicio cremación directa\n"
-                "F. Servicio paquete de cremación\n"
-                "G. Servicio paquete legal\n"
-                "H. Servicio de refrigeración y conservación\n\n"
-                "Escribe la *letra* del plan que deseas consultar."
-            )
-        elif mensaje == "2":
-            sesiones[telefono]["submenu"] = "futuro"
-            return responder(
-                "🕰️ *Planes a futuro:*\n"
-                "I. Red Biker\n"
-                "J. Red Plus\n"
-                "K. Red Consorcio\n"
-                "L. Red Adulto Mayor\n"
-                "M. Preventa de Nichos a Temporalidad\n\n"
-                "Escribe la *letra* del plan que deseas consultar."
-            )
-        elif mensaje == "3":
-            sesiones[telefono]["submenu"] = "servicios"
-            return responder(
-                "🧰 *Servicios individuales:*\n"
-                "N. Traslado\n"
-                "O. Ataúd\n"
-                "P. Urna\n"
-                "Q. Velación\n"
-                "R. Boletas\n\n"
-                "Escribe la *letra* del servicio que deseas consultar."
-            )
-
-    submenu = estado.get("submenu")
-    if submenu:
-        categorias = {
-            "inmediato": [
-                "crédito de necesidad inmediata", "servicio paquete fetal cremación",
-                "servicio paquete sencillo sepultura", "servicio paquete básico sepultura",
-                "servicio cremación directa", "servicio paquete de cremación",
-                "servicio paquete legal", "servicio de refrigeración y conservación"
-            ],
-            "futuro": [
-                "red biker", "red plus", "red consorcio",
-                "red adulto mayor", "preventa de nichos a temporalidad"
-            ],
-            "servicios": ["traslado", "ataúd", "urna", "velación", "boletas"]
-        }
-
-        letra = mensaje.strip().upper()
-        total = len(categorias[submenu])
-        letra_valida = [chr(65 + i) for i in range(total)]  # ['A', 'B', ..., 'H']
-
-        if letra in letra_valida:
-            index = ord(letra) - 65
-            plan = categorias[submenu][index]
-            respuesta = responder_plan(plan)
-            if respuesta:
-                return responder(respuesta + "\n\n✉️ *¿Deseas consultar otro? Solo escribe otra letra.*")
-            else:
-                return responder("🤖 Ese plan existe pero está en mantenimiento.")
-        else:
-            return responder("❌ Letra inválida. Intenta con una opción válida del menú.")
-
-    # Emergencias
-    if mensaje == "2":
-        sesiones[telefono] = {"menu": "emergencia"}
-        return responder(
-            "🚨 *ATENCIÓN INMEDIATA*\n\n"
-            "Responde con:\n"
-            "🔹 Nombre del fallecido\n"
-            "🔹 Qué ocurrió\n"
-            "🔹 Ubicación del cuerpo\n"
-            "🔹 Dos teléfonos de contacto\n"
-            "🔹 Tu nombre"
-        )
 
     if estado.get("menu") == "emergencia":
-        if contiene_emergencia(mensaje) or len(mensaje.split()) >= 6:
+        if len(mensaje.split()) >= 5 or contiene(claves_emergencia, mensaje):
             alerta = f"📨 *EMERGENCIA RECIBIDA*\nDesde: {telefono}\n\n{mensaje}"
             requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
                 "To": NUMERO_REENVIO,
@@ -162,11 +117,12 @@ def webhook():
                 "Body": alerta
             })
             sesiones[telefono] = {}
-            return responder("✅ Gracias. Hemos recibido tu emergencia. Un asesor te contactará pronto.")
+            return responder("✅ Gracias. Hemos recibido tu emergencia. Un asesor te contactará de inmediato.")
+        else:
+            return responder("📝 Por favor, indícanos: nombre del fallecido, ubicación y contacto.")
 
-    # Ubicaciones y citas
-    if mensaje == "3":
-        sesiones[telefono] = {"menu": "ubicacion"}
+    if estado.get("menu") == "ubicacion":
+        sesiones[telefono] = {"menu": "ubicacion-confirmada"}
         return responder(
             "📍 *Ubicaciones disponibles:*\n"
             "1. Av. Tláhuac No. 5502, Col. El Rosario, CDMX\n"
@@ -175,28 +131,63 @@ def webhook():
             "¿Deseas agendar una cita? (Sí / No)"
         )
 
-    if estado.get("menu") == "ubicacion" and mensaje in ["sí", "si"]:
+    if estado.get("menu") == "ubicacion-confirmada" and mensaje in ["sí", "si"]:
         sesiones[telefono] = {"menu": "cita"}
-        return responder(
-            "📅 *Agendemos tu cita.*\n\n"
-            "¿Qué día te gustaría venir?\n"
-            "¿En qué horario te acomoda?\n\n"
-            "Tu respuesta será enviada a nuestro equipo."
-        )
+        return responder("📅 Indícanos día y horario para agendar tu cita.")
 
     if estado.get("menu") == "cita":
-        aviso = f"📆 *CITA SOLICITADA*\nCliente: {telefono}\nDatos:\n{mensaje}"
+        aviso = f"📆 *CITA SOLICITADA*\nCliente: {telefono}\nDatos: {mensaje}"
         requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
             "To": NUMERO_REENVIO,
             "From": "whatsapp:+14155238886",
             "Body": aviso
         })
         sesiones[telefono] = {}
-        return responder("✅ Gracias. Hemos registrado tu cita. Nos pondremos en contacto.")
+        return responder("✅ Cita registrada. Un asesor te contactará para confirmar.")
 
-    # Intento final por palabra clave
-    posible = responder_plan(mensaje)
+    if estado.get("menu") == "planes":
+        for clave, grupo in submenus.items():
+            if mensaje in [clave, clave[:3]]:
+                sesiones[telefono] = {"submenu": clave}
+                letras = grupo["letras"]
+                nombres = grupo["planes"]
+                lista = "\n".join([f"{letras[i]}. {nombres[i].capitalize()}" for i in range(len(letras))])
+                return responder(f"📋 *{clave.upper()}*\n{lista}\n\nSelecciona la letra o escribe palabras clave como 'biker', 'nichos', etc.")
+
+    if "submenu" in estado:
+        grupo = submenus.get(estado["submenu"])
+        letras = grupo["letras"]
+        nombres = grupo["planes"]
+        letra = mensaje.strip().upper()[:1]
+        if letra in letras:
+            plan = nombres[letras.index(letra)]
+            respuesta = responder_plan(plan)
+            if respuesta:
+                return responder(respuesta + "\n\n✉️ Puedes consultar otro o escribir *menú*.")
+        else:
+            posible = buscar_plan_por_clave(mensaje)
+            if posible:
+                return responder(posible + "\n\n✉️ Puedes consultar otro o escribir *menú*.")
+            else:
+                intentos = estado.get("intentos", 0) + 1
+                sesiones[telefono]["intentos"] = intentos
+                if intentos == 1:
+                    return responder("❌ No reconocimos tu selección. Intenta otra letra o palabra clave del servicio que necesitas.")
+                elif intentos == 2:
+                    return responder("📌 El plan o servicio que mencionas podría estar en mantenimiento o no disponible actualmente. Si deseas más ayuda, puedes escribirnos directamente.")
+                else:
+                    if "submenu" in sesiones[telefono]:
+                        submenu = sesiones[telefono]["submenu"]
+                        letras = submenus[submenu]["letras"]
+                        nombres = submenus[submenu]["planes"]
+                        lista = "\n".join([f"{letras[i]}. {nombres[i].capitalize()}" for i in range(len(letras))])
+                        return responder(f"📋 *{submenu.upper()}*\n{lista}\n\nSelecciona la letra o escribe palabras clave como 'biker', 'nichos', etc.")
+                    else:
+                        sesiones[telefono] = {}
+                        return responder(MENSAJE_BIENVENIDA)
+
+    posible = buscar_plan_por_clave(mensaje)
     if posible:
-        return responder(posible)
+        return responder(posible + "\n\n✉️ Si deseas volver al menú, escribe *menú* o *volver*.")
     else:
-        return responder("📌 Si necesitas ayuda, escribe *hola* o selecciona una opción del menú.")
+        return responder("📌 Por favor indícanos si deseas información sobre emergencia, servicios o ubicaciones. Puedes escribir palabras como: *emergencia*, *cremación*, *nichos*, *adulto mayor*, *biker*, *ubicación*, etc.")
