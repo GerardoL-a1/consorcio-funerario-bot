@@ -27,7 +27,6 @@ MENSAJE_BIENVENIDA = (
     "3️⃣ Ubicaciones"
 )
 
-# Listas para reconocer comandos
 contacto = ["hola", "holaaa", "ola", "holis", "buenas", "buen día", "saludos", "info", "ayuda"]
 emergencia_claves = ["fallecido", "falleció", "murió", "hospital", "urgente", "emergencia", "traslado", "defunción"]
 comandos_menu = [
@@ -42,9 +41,6 @@ def responder(texto):
     res = MessagingResponse()
     res.message(texto)
     return str(res)
-
-def letra_a_indice(letra):
-    return ord(letra.upper()) - 65
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
@@ -129,16 +125,20 @@ def webhook():
             "servicios": ["traslado", "ataúd", "urna", "velación", "boletas"]
         }
 
-        try:
-            index = letra_a_indice(mensaje)
+        letra = mensaje.strip().upper()
+        total = len(categorias[submenu])
+        letra_valida = [chr(65 + i) for i in range(total)]  # ['A', 'B', ..., 'H']
+
+        if letra in letra_valida:
+            index = ord(letra) - 65
             plan = categorias[submenu][index]
             respuesta = responder_plan(plan)
             if respuesta:
                 return responder(respuesta + "\n\n✉️ *¿Deseas consultar otro? Solo escribe otra letra.*")
             else:
-                return responder("🤖 El plan existe pero está en mantenimiento. Intenta más tarde.")
-        except (IndexError, ValueError):
-            return responder("❌ Letra inválida. Intenta con una opción del menú.")
+                return responder("🤖 Ese plan existe pero está en mantenimiento.")
+        else:
+            return responder("❌ Letra inválida. Intenta con una opción válida del menú.")
 
     # Emergencias
     if mensaje == "2":
@@ -194,7 +194,7 @@ def webhook():
         sesiones[telefono] = {}
         return responder("✅ Gracias. Hemos registrado tu cita. Nos pondremos en contacto.")
 
-    # Última opción: palabra clave directa
+    # Intento final por palabra clave
     posible = responder_plan(mensaje)
     if posible:
         return responder(posible)
