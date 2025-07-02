@@ -1,6 +1,4 @@
 
-# Versión final de app.py para el bot de WhatsApp de Consorcio Funerario (actualizado con letras corregidas y listado completo de servicios individuales)
-
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 from planes_info import responder_plan
