@@ -28,12 +28,11 @@ MENSAJE_BIENVENIDA = (
     "3️⃣ Ubicaciones"
 )
 
-# Palabras clave tolerantes
 contacto = ["hola", "holaaa", "ola", "holis", "buenas", "buen dia", "buenos dias", "saludos", "empezar", "iniciar", "info", "información", "ayuda"]
-emergencia_claves = ["fallecido", "suceso", "ubicación", "contacto", "murio", "fallecio", "defuncion", "urgente", "emergencia", "perdimos", "hospital", "traslado"]
+emergencia_claves = ["fallecido", "falleció", "suceso", "ubicación", "murio", "fallecio", "defuncion", "urgente", "emergencia", "perdimos", "hospital", "traslado"]
 
 def contiene_emergencia(mensaje):
-    return sum(p in mensaje.lower() for p in emergencia_claves) >= 2
+    return sum(p in mensaje.lower() for p in emergencia_claves) >= 1
 
 def responder(texto):
     respuesta = MessagingResponse()
@@ -46,10 +45,12 @@ def webhook():
     telefono = request.form.get("From", "")
     estado = sesiones.get(telefono, {})
 
-    # Mostrar bienvenida solo si NO hay sesión activa Y el mensaje no es una opción válida
-    if telefono not in sesiones or not sesiones[telefono]:
-        if mensaje not in ["1", "2", "3"]:
-            sesiones[telefono] = {}
+    # Mostrar bienvenida solo si no hay sesión válida ni flujo
+    if "menu" not in estado:
+        if mensaje in ["1", "2", "3"]:
+            sesiones[telefono] = {"menu": "temporal"}
+        else:
+            sesiones[telefono] = {"menu": "temporal"}
             return responder(MENSAJE_BIENVENIDA)
 
     if mensaje == "1":
@@ -99,7 +100,6 @@ def webhook():
                 "Responde con el número del servicio para ver detalles."
             )
 
-    # Selección por número dentro del submenu
     submenu = estado.get("submenu")
     if submenu:
         categorias = {
@@ -139,15 +139,16 @@ def webhook():
             "🔹 Nombre de la persona que nos está contactando"
         )
 
-    if estado.get("menu") == "emergencia" and contiene_emergencia(mensaje):
-        alerta = f"📨 *EMERGENCIA RECIBIDA*\nMensaje: {mensaje}\nDesde: {telefono}"
-        requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
-            "To": NUMERO_REENVIO,
-            "From": "whatsapp:+14155238886",
-            "Body": alerta
-        })
-        sesiones[telefono] = {}
-        return responder("✅ Gracias. Hemos recibido tu emergencia. Un asesor te contactará de inmediato.")
+    if estado.get("menu") == "emergencia":
+        if contiene_emergencia(mensaje) or len(mensaje.split()) >= 5:
+            alerta = f"📨 *EMERGENCIA RECIBIDA*\nMensaje: {mensaje}\nDesde: {telefono}"
+            requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
+                "To": NUMERO_REENVIO,
+                "From": "whatsapp:+14155238886",
+                "Body": alerta
+            })
+            sesiones[telefono] = {}
+            return responder("✅ Gracias. Hemos recibido tu emergencia. Un asesor te contactará de inmediato.")
 
     if mensaje == "3":
         sesiones[telefono] = {"menu": "ubicacion"}
@@ -178,9 +179,10 @@ def webhook():
         sesiones[telefono] = {}
         return responder("✅ Gracias. Hemos registrado tu solicitud. Nuestro equipo te contactará pronto.")
 
-    # Intento final: búsqueda directa por palabra clave
+    # Último intento por palabra clave directa
     posible = responder_plan(mensaje)
     if posible:
         return responder(posible)
     else:
-        return responder("🤖 Por favor escribe el nombre de un plan o servicio correctamente y si lo hiciste de manera correcta es posible que en estos momentos ese plan se encuentre en modificaciones.")
+        return responder("📌 Si necesitas ayuda, escribe *hola* o selecciona una opción del menú.")
+        
