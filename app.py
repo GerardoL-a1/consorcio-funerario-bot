@@ -188,13 +188,64 @@ def webhook():
         sesiones[telefono] = {}
         return responder("✅ Gracias. Hemos registrado tu solicitud. Nuestro equipo te contactará pronto.")
 
-    if estado.get("menu") == "planes":
+   if estado.get("menu") == "planes":
         if mensaje == "1":
             sesiones[telefono] = {"submenu": "inmediato"}
+            return responder(
+                "⏱️ *Planes de necesidad inmediata:*\n"
+                "A. Crédito de necesidad inmediata\n"
+                "B. Servicio paquete fetal cremación\n"
+                "C. Servicio paquete sencillo sepultura\n"
+                "D. Servicio paquete básico sepultura\n"
+                "E. Servicio cremación directa\n"
+                "F. Servicio paquete de cremación\n"
+                "G. Servicio paquete legal\n"
+                "H. Servicio de refrigeración y conservación\n\n"
+                "Escribe la letra correspondiente para más información."
+            )
         elif mensaje == "2":
             sesiones[telefono] = {"submenu": "futuro"}
+            return responder(
+                "🕰️ *Planes a futuro:*\n"
+                "I. Red Biker\n"
+                "J. Red Plus\n"
+                "K. Red Consorcio\n"
+                "L. Red Adulto Mayor\n"
+                "M. Preventa de Nichos a Temporalidad\n\n"
+                "Escribe la letra correspondiente para más información."
+            )
         elif mensaje == "3":
             sesiones[telefono] = {"submenu": "servicios"}
+            return responder(
+                "🧰 *Servicios individuales:*\n"
+                "N. Traslado\n"
+                "O. Ataúd\n"
+                "P. Urna\n"
+                "Q. Velación\n"
+                "R. Boletas\n"
+                "S. Carroza local\n"
+                "T. Carroza a panteón u horno crematorio\n"
+                "U. Carroza legal\n"
+                "V. Camión local\n"
+                "W. Embalsamado\n"
+                "X. Embalsamado legal\n"
+                "Y. Embalsamado infecto-contagiosa\n"
+                "Z. Trámites de inhumación\n"
+                "AA. Trámites de cremación\n"
+                "AB. Trámites legales\n"
+                "AC. Trámites de traslado\n"
+                "AD. Trámites de internación nacional\n"
+                "AE. Trámites de internación internacional\n"
+                "AF. Equipo de velación\n"
+                "AG. Cirios\n"
+                "AH. Capilla de gobierno\n"
+                "AI. Capilla particular\n"
+                "AJ. Traslado carretero por km\n"
+                "AK. Traslado de terracería por km\n"
+                "AL. Camión foráneo por km\n\n"
+                "Escribe la letra correspondiente para más información."
+            )
+
         return responder("✍️ Escribe la letra del plan o servicio que deseas consultar (por ejemplo A, b, AL, etc).")
 
     if estado.get("submenu"):
