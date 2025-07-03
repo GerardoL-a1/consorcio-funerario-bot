@@ -69,15 +69,11 @@ selecciones_letras = {
     **{k: "camión foráneo por km" for k in ["AL", "al", "Al", "aL"]},
 }
 
-claves_saludo = [
-    "hola", "hello", "hi", "buenos días", "buenas tardes", "buenas noches",
-    "que tal", "qué tal", "saludos", "para un servicio"
-]
-
 claves_planes = ["plan", "planes", "servicio", "servicios", "paquete", "información", "informacion"]
 claves_emergencia = ["emergencia", "urgente", "fallecido", "murió", "murio", "accidente", "suceso"]
 claves_ubicacion = ["ubicación", "ubicaciones", "sucursal", "sucursales", "dirección", "direccion"]
 claves_volver = ["volver", "menú", "menu", "inicio"]
+claves_cierre = ["gracias", "ok", "vale", "de acuerdo", "listo", "perfecto", "entendido", "muy bien"]
 
 def contiene(palabras, mensaje):
     return any(p in mensaje.lower() for p in palabras)
@@ -98,10 +94,11 @@ def webhook():
         sesiones[telefono] = {}
         return responder(MENSAJE_BIENVENIDA)
 
+    if contiene(claves_cierre, msj_lower):
+        return responder("👌 Gracias por confirmar. Si necesitas algo más, puedes escribir *menú* para volver a empezar o seleccionar otra opción.")
+
     if not estado:
-        if contiene(claves_saludo, msj_lower):
-            return responder(MENSAJE_BIENVENIDA)
-        elif contiene(claves_emergencia, msj_lower):
+        if contiene(claves_emergencia, msj_lower):
             sesiones[telefono] = {"menu": "emergencia"}
             return responder(
                 "🚨 *ATENCIÓN INMEDIATA*\n\n"
