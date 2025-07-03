@@ -3,13 +3,13 @@ from flask import Flask, request from twilio.twiml.messaging_response import Mes
 
 app = Flask(name)
 
-TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID") TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN") TWILIO_MESSAGING_URL = f"https://api.twilio.com/2010-04-01/Accounts/{TWILIO_ACCOUNT_SID}/Messages.json" TWILIO_AUTH = (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-
-NUMERO_REENVIO = "+525523604519" sesiones = {}
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID") TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN") TWILIO_MESSAGING_URL = f"https://api.twilio.com/2010-04-01/Accounts/{TWILIO_ACCOUNT_SID}/Messages.json" TWILIO_AUTH = (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN) NUMERO_REENVIO = "+525523604519" sesiones = {}
 
 @app.route("/", methods=["GET"]) def home(): return "✅ Bot Consorcio Funerario funcionando."
 
 MENSAJE_BIENVENIDA = ( "👋 Bienvenido a Consorcio Funerario\n\n" "Gracias por escribirnos.\n\n" "Por favor indíquenos en qué le gustaría recibir información o en qué podemos apoyarle:\n" "- Atención inmediata por emergencia\n" "- Conocer nuestros servicios funerarios\n" "- Consultar nuestras ubicaciones disponibles\n\n" "📌 Puede escribir palabras como: emergencia, planes, servicios, ubicación, etc." )
+
+Diccionario de letras y combinaciones para redirección de planes/servicios
 
 selecciones_letras = { **{k: "crédito de necesidad inmediata" for k in ["A", "a"]}, **{k: "servicio paquete fetal cremación" for k in ["B", "b"]}, **{k: "servicio paquete sencillo sepultura" for k in ["C", "c"]}, **{k: "servicio paquete básico sepultura" for k in ["D", "d"]}, **{k: "servicio cremación directa" for k in ["E", "e"]}, **{k: "servicio paquete de cremación" for k in ["F", "f"]}, **{k: "servicio paquete legal" for k in ["G", "g"]}, **{k: "servicio de refrigeración y conservación" for k in ["H", "h"]}, **{k: "red biker" for k in ["I", "i"]}, **{k: "red plus" for k in ["J", "j"]}, **{k: "red consorcio" for k in ["K", "k"]}, **{k: "red adulto mayor" for k in ["L", "l"]}, **{k: "preventa de nichos a temporalidad" for k in ["M", "m"]}, **{k: "traslado" for k in ["N", "n"]}, **{k: "ataúd" for k in ["O", "o"]}, **{k: "urna" for k in ["P", "p"]}, **{k: "velación" for k in ["Q", "q"]}, **{k: "boletas" for k in ["R", "r"]}, **{k: "carroza local" for k in ["S", "s"]}, **{k: "carroza a panteón u horno crematorio" for k in ["T", "t"]}, **{k: "carroza legal" for k in ["U", "u"]}, **{k: "camión local" for k in ["V", "v"]}, **{k: "embalsamado" for k in ["W", "w"]}, **{k: "embalsamado legal" for k in ["X", "x"]}, **{k: "embalsamado infecto-contagiosa" for k in ["Y", "y"]}, **{k: "trámites de inhumación" for k in ["Z", "z"]}, **{k: "trámites de cremación" for k in ["AA", "aa", "Aa", "aA"]}, **{k: "trámites legales" for k in ["AB", "ab", "Ab", "aB"]}, **{k: "trámites de traslado" for k in ["AC", "ac", "Ac", "aC"]}, **{k: "trámites de internación nacional" for k in ["AD", "ad", "Ad", "aD"]}, **{k: "trámites de internación internacional" for k in ["AE", "ae", "Ae", "aE"]}, **{k: "equipo de velación" for k in ["AF", "af", "Af", "aF"]}, **{k: "cirios" for k in ["AG", "ag", "Ag", "aG"]}, **{k: "capilla de gobierno" for k in ["AH", "ah", "Ah", "aH"]}, **{k: "capilla particular" for k in ["AI", "ai", "Ai", "aI"]}, **{k: "traslado carretero por km" for k in ["AJ", "aj", "Aj", "aJ"]}, **{k: "traslado de terracería por km" for k in ["AK", "ak", "Ak", "aK"]}, **{k: "camión foráneo por km" for k in ["AL", "al", "Al", "aL"]}, }
 
@@ -106,7 +106,7 @@ if estado.get("submenu"):
         respuesta = responder_plan(clave)
         return responder(respuesta)
     else:
-        return responder("❌ No reconocimos tu selección. Intenta con otra letra o palabra clave, o escribe *menú* para regresar al inicio.")
+        return responder("❌ No reconocimos tu selección. Intenta con otra letra o palabra clave.")
 
 return responder(MENSAJE_BIENVENIDA)
 
