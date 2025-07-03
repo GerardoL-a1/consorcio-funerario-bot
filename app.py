@@ -26,7 +26,7 @@ MENSAJE_BIENVENIDA = (
     "- Atención inmediata por *emergencia*\n"
     "- Conocer nuestros *servicios funerarios*\n"
     "- Consultar nuestras *ubicaciones disponibles*\n\n"
-    "📌 Puede escribir palabras como: *emergencia*, *planes*, *nichos*, *traslado*, *ubicación*, etc."
+    "📌 Puede escribir palabras como: *emergencia*, *planes*, *servicios*, *ubicación*, etc."
 )
 
 claves_planes = ["plan", "planes", "servicio", "servicios", "paquete", "información", "informacion"]
