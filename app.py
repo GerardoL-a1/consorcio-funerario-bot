@@ -75,6 +75,12 @@ claves_ubicacion = ["ubicación", "ubicaciones", "sucursal", "sucursales", "dire
 claves_volver = ["volver", "menú", "menu", "inicio"]
 claves_cierre = ["gracias", "ok", "vale", "de acuerdo", "listo", "perfecto", "entendido", "muy bien"]
 
+# CONFIGURAR GOOGLE SHEETS
+alcance = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+credenciales = ServiceAccountCredentials.from_json_keyfile_name("credenciales.json", alcance)
+cliente = gspread.authorize(credenciales)
+hoja = cliente.open("Clientes Consorcio Funerario").sheet1
+
 def contiene(palabras, mensaje):
     return any(p in mensaje.lower() for p in palabras)
 
@@ -83,12 +89,32 @@ def responder(texto):
     respuesta.message(texto)
     return str(respuesta)
 
+def registrar_interaccion(numero, mensaje, origen="Cliente"):
+    fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    hoja.append_row([fecha, numero, origen, mensaje])
+
+def mensaje_inactividad(numero):
+    if numero in sesiones:
+        requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
+            "To": numero,
+            "From": "whatsapp:+14155238886",
+            "Body": "⌛ ¿Aún estás ahí? Si necesitas ayuda, escribe *menú* para volver al inicio."
+        })
+        temporizadores.pop(numero, None)
+
 @app.route("/webhook", methods=["POST"])
 def webhook():
     mensaje = request.form.get("Body", "").strip()
     telefono = request.form.get("From", "")
     estado = sesiones.get(telefono, {})
     msj_lower = mensaje.lower()
+    registrar_interaccion(telefono, mensaje)
+
+    if telefono in temporizadores:
+        temporizadores[telefono].cancel()
+    temporizador = threading.Timer(600, mensaje_inactividad, args=(telefono,))
+    temporizador.start()
+    temporizadores[telefono] = temporizador
 
     if contiene(claves_volver, msj_lower):
         sesiones[telefono] = {}
