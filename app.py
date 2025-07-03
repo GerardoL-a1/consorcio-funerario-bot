@@ -26,8 +26,50 @@ MENSAJE_BIENVENIDA = (
     "- Atención inmediata por *emergencia*\n"
     "- Conocer nuestros *servicios funerarios*\n"
     "- Consultar nuestras *ubicaciones disponibles*\n\n"
-    "📌 Puede escribir palabras como: *emergencia*, *planes*, *servicios*, *ubicación*, etc."
+    "📌 Puede escribir palabras como: *emergencia*, *planes*, *nichos*, *traslado*, *ubicación*, etc."
 )
+
+# Diccionario de selección por letras (con variantes)
+selecciones_letras = {
+    **{k: "crédito de necesidad inmediata" for k in ["A", "a"]},
+    **{k: "servicio paquete fetal cremación" for k in ["B", "b"]},
+    **{k: "servicio paquete sencillo sepultura" for k in ["C", "c"]},
+    **{k: "servicio paquete básico sepultura" for k in ["D", "d"]},
+    **{k: "servicio cremación directa" for k in ["E", "e"]},
+    **{k: "servicio paquete de cremación" for k in ["F", "f"]},
+    **{k: "servicio paquete legal" for k in ["G", "g"]},
+    **{k: "servicio de refrigeración y conservación" for k in ["H", "h"]},
+    **{k: "red biker" for k in ["I", "i"]},
+    **{k: "red plus" for k in ["J", "j"]},
+    **{k: "red consorcio" for k in ["K", "k"]},
+    **{k: "red adulto mayor" for k in ["L", "l"]},
+    **{k: "preventa de nichos a temporalidad" for k in ["M", "m"]},
+    **{k: "traslado" for k in ["N", "n"]},
+    **{k: "ataúd" for k in ["O", "o"]},
+    **{k: "urna" for k in ["P", "p"]},
+    **{k: "velación" for k in ["Q", "q"]},
+    **{k: "boletas" for k in ["R", "r"]},
+    **{k: "carroza local" for k in ["S", "s"]},
+    **{k: "carroza a panteón u horno crematorio" for k in ["T", "t"]},
+    **{k: "carroza legal" for k in ["U", "u"]},
+    **{k: "camión local" for k in ["V", "v"]},
+    **{k: "embalsamado" for k in ["W", "w"]},
+    **{k: "embalsamado legal" for k in ["X", "x"]},
+    **{k: "embalsamado infecto-contagiosa" for k in ["Y", "y"]},
+    **{k: "trámites de inhumación" for k in ["Z", "z"]},
+    **{k: "trámites de cremación" for k in ["AA", "aa", "Aa", "aA"]},
+    **{k: "trámites legales" for k in ["AB", "ab", "Ab", "aB"]},
+    **{k: "trámites de traslado" for k in ["AC", "ac", "Ac", "aC"]},
+    **{k: "trámites de internación nacional" for k in ["AD", "ad", "Ad", "aD"]},
+    **{k: "trámites de internación internacional" for k in ["AE", "ae", "Ae", "aE"]},
+    **{k: "equipo de velación" for k in ["AF", "af", "Af", "aF"]},
+    **{k: "cirios" for k in ["AG", "ag", "Ag", "aG"]},
+    **{k: "capilla de gobierno" for k in ["AH", "ah", "Ah", "aH"]},
+    **{k: "capilla particular" for k in ["AI", "ai", "Ai", "aI"]},
+    **{k: "traslado carretero por km" for k in ["AJ", "aj", "Aj", "aJ"]},
+    **{k: "traslado de terracería por km" for k in ["AK", "ak", "Ak", "aK"]},
+    **{k: "camión foráneo por km" for k in ["AL", "al", "Al", "aL"]},
+}
 
 claves_planes = ["plan", "planes", "servicio", "servicios", "paquete", "información", "informacion"]
 claves_emergencia = ["emergencia", "urgente", "fallecido", "murió", "murio", "accidente", "suceso"]
@@ -121,65 +163,19 @@ def webhook():
     if estado.get("menu") == "planes":
         if mensaje == "1":
             sesiones[telefono] = {"submenu": "inmediato"}
-            return responder(
-                "⏱️ *Planes de necesidad inmediata:*\n"
-                "A. Crédito de necesidad inmediata\n"
-                "B. Servicio paquete fetal cremación\n"
-                "C. Servicio paquete sencillo sepultura\n"
-                "D. Servicio paquete básico sepultura\n"
-                "E. Servicio cremación directa\n"
-                "F. Servicio paquete de cremación\n"
-                "G. Servicio paquete legal\n"
-                "H. Servicio de refrigeración y conservación\n\n"
-                "Escribe la letra correspondiente para más información."
-            )
         elif mensaje == "2":
             sesiones[telefono] = {"submenu": "futuro"}
-            return responder(
-                "🕰️ *Planes a futuro:*\n"
-                "I. Red Biker\n"
-                "J. Red Plus\n"
-                "K. Red Consorcio\n"
-                "L. Red Adulto Mayor\n"
-                "M. Preventa de Nichos a Temporalidad\n\n"
-                "Escribe la letra correspondiente para más información."
-            )
         elif mensaje == "3":
             sesiones[telefono] = {"submenu": "servicios"}
-            return responder(
-                "🧰 *Servicios individuales:*\n"
-                "N. Traslado\n"
-                "O. Ataúd\n"
-                "P. Urna\n"
-                "Q. Velación\n"
-                "R. Boletas\n"
-                "S. Carroza local\n"
-                "T. Carroza a panteón u horno crematorio\n"
-                "U. Carroza legal\n"
-                "V. Camión local\n"
-                "W. Embalsamado\n"
-                "X. Embalsamado legal\n"
-                "Y. Embalsamado infecto-contagiosa\n"
-                "Z. Trámites de inhumación\n"
-                "AA. Trámites de cremación\n"
-                "AB. Trámites legales\n"
-                "AC. Trámites de traslado\n"
-                "AD. Trámites de internación nacional\n"
-                "AE. Trámites de internación internacional\n"
-                "AF. Equipo de velación\n"
-                "AG. Cirios\n"
-                "AH. Capilla de gobierno\n"
-                "AI. Capilla particular\n"
-                "AJ. Traslado carretero por km\n"
-                "AK. Traslado de terracería por km\n"
-                "AL. Camión foráneo por km\n\n"
-                "Escribe la letra correspondiente para más información."
-            )
+        return responder("✍️ Escribe la letra del plan o servicio que deseas consultar (por ejemplo A, b, AL, etc).")
 
     if estado.get("submenu"):
-        texto = responder_plan(msj_lower)
-        if "No entendí tu mensaje" in texto:
-            return responder("❌ No reconocimos tu selección. Intenta con otra letra o palabra clave del servicio que necesitas.")
-        return responder(texto)
+        letra = mensaje.strip().replace(" ", "")
+        if letra in selecciones_letras:
+            clave = selecciones_letras[letra]
+            respuesta = responder_plan(clave)
+            return responder(respuesta)
+        else:
+            return responder("❌ No reconocimos tu selección. Intenta con otra letra o palabra clave.")
 
     return responder(MENSAJE_BIENVENIDA)
