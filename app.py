@@ -4,13 +4,16 @@ from twilio.twiml.messaging_response import MessagingResponse
 from planes_info import responder_plan
 import requests
 import os
+import openai
 
 app = Flask(__name__)
 
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 TWILIO_MESSAGING_URL = f"https://api.twilio.com/2010-04-01/Accounts/{TWILIO_ACCOUNT_SID}/Messages.json"
 TWILIO_AUTH = (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+openai.api_key = OPENAI_API_KEY
 
 NUMERO_REENVIO = "+525523604519"
 sesiones = {}
@@ -75,13 +78,30 @@ claves_emergencia = ["emergencia", "urgente", "fallecido", "murió", "murio", "a
 claves_ubicacion = ["ubicación", "ubicaciones", "sucursal", "sucursales", "dirección", "direccion"]
 claves_volver = ["volver", "menú", "menu", "inicio"]
 
+
 def contiene(palabras, mensaje):
     return any(p in mensaje.lower() for p in palabras)
+
 
 def responder(texto):
     respuesta = MessagingResponse()
     respuesta.message(texto)
     return str(respuesta)
+
+
+def respuesta_gpt(mensaje_usuario):
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Eres un asistente para atención funeraria. Responde de forma breve, profesional y clara."},
+                {"role": "user", "content": mensaje_usuario}
+            ]
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        return "⚠️ Lo sentimos, no pudimos procesar tu solicitud en este momento."
+
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
@@ -124,7 +144,7 @@ def webhook():
                 "3. Servicios individuales"
             )
         else:
-            return responder(MENSAJE_BIENVENIDA)
+            return responder(respuesta_gpt(mensaje))
 
     if estado.get("menu") == "emergencia":
         alerta = f"📨 *EMERGENCIA RECIBIDA*\nMensaje: {mensaje}\nDesde: {telefono}"
