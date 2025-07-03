@@ -261,6 +261,141 @@ planes_info = {
         "🔸 Trámite legal y certificado\n"
         "🔸 Acompañamiento profesional\n"
         "🔸 +28 años al servicio de las familias"
+    ),
+
+    "carroza local": (
+        "🚗 *Carroza Local*\n\n"
+        "Servicio de traslado dentro de la misma alcaldía o zona urbana.\n"
+        "Ideal para recolección en domicilio y traslado a panteón u horno local.\n\n"
+        "💰 Costo: Desde $1,500.00 + IVA\n\n"
+        "🛡️ Garantías:\n"
+        "🔸 Conductores capacitados\n"
+        "🔸 Vehículos higienizados y equipados"
+    ),
+
+    "carroza a panteón u horno crematorio": (
+        "🚘 *Carroza a Panteón u Horno Crematorio*\n\n"
+        "Traslado digno desde domicilio o capilla hasta el panteón o crematorio seleccionado.\n\n"
+        "💰 Costo: Desde $2,200.00 + IVA\n\n"
+        "🛡️ Garantías:\n"
+        "🔸 Unidades discretas y climatizadas\n"
+        "🔸 Respeto en el último trayecto"
+    ),
+
+    "carroza legal": (
+        "🚓 *Carroza Legal*\n\n"
+        "Carroza autorizada para recolección desde SEMEFO o Ministerio Público.\n"
+        "Con documentos de respaldo y cobertura legal.\n\n"
+        "💰 Costo: Desde $3,500.00 + IVA\n\n"
+        "🛡️ Garantías:\n"
+        "🔸 Documentación en regla\n"
+        "🔸 Coordinación con autoridades"
+    ),
+
+    "camión local": (
+        "🚛 *Camión Local*\n\n"
+        "Camiones habilitados para traslados de ataúdes o restos en zonas urbanas o rurales.\n"
+        "Capacidad para múltiples servicios.\n\n"
+        "💰 Costo: Desde $1,800.00 + IVA"
+    ),
+
+    "embalsamado": (
+        "💉 *Embalsamado Básico*\n\n"
+        "Tratamiento químico para preservar el cuerpo por tiempo corto o velaciones simples.\n\n"
+        "💰 Costo: $1,200.00 + IVA"
+    ),
+
+    "embalsamado legal": (
+        "⚖️ *Embalsamado Legal*\n\n"
+        "Proceso requerido por autoridades cuando el cuerpo va a ser trasladado fuera del estado o del país.\n\n"
+        "💰 Costo: $2,800.00 + IVA"
+    ),
+
+    "embalsamado infecto-contagiosa": (
+        "☣️ *Embalsamado Infecto-Contagioso*\n\n"
+        "Tratamiento especial con químicos certificados para casos de fallecimiento por enfermedades contagiosas.\n\n"
+        "💰 Costo: $3,800.00 + IVA"
+    ),
+
+    "trámites de inhumación": (
+        "📜 *Trámite de Inhumación*\n\n"
+        "Gestión ante Registro Civil y panteones para entierro legal.\n"
+        "Incluye papeleo, coordinación y permisos.\n\n"
+        "💰 Costo: $1,000.00 + IVA"
+    ),
+
+    "trámites de cremación": (
+        "📜 *Trámite de Cremación*\n\n"
+        "Gestión legal ante Registro Civil y crematorios para autorizar cremación.\n"
+        "Incluye boleta y requisitos de ley.\n\n"
+        "💰 Costo: $1,000.00 + IVA"
+    ),
+
+    "trámites legales": (
+        "⚖️ *Trámites Legales Funerarios*\n\n"
+        "Asesoría y gestión en caso de fallecimiento por dictamen médico legal.\n"
+        "Incluye Ministerio Público y SEMEFO.\n\n"
+        "💰 Costo: $3,000.00 + IVA"
+    ),
+
+    "trámites de traslado": (
+        "🚚 *Trámite de Traslado de Cuerpo*\n\n"
+        "Permisos y logística para movilizar un cuerpo fuera del municipio o estado.\n\n"
+        "💰 Costo: $2,000.00 + IVA"
+    ),
+
+    "trámites de internación nacional": (
+        "🛃 *Internación Nacional*\n\n"
+        "Trámite ante autoridades federales para entrada de restos desde otros estados del país.\n\n"
+        "💰 Costo: $3,000.00 + IVA"
+    ),
+
+    "trámites de internación internacional": (
+        "✈️ *Internación Internacional*\n\n"
+        "Gestión legal para recibir restos desde el extranjero, con consulados y aduanas.\n\n"
+        "💰 Costo: $8,000.00 + IVA"
+    ),
+
+    "equipo de velación": (
+        "🕯️ *Equipo de Velación*\n\n"
+        "Incluye cristo, pedestal, 4 candeleros, mesa, mantel y velas decorativas.\n\n"
+        "💰 Costo: $1,500.00 + IVA"
+    ),
+
+    "cirios": (
+        "🕯️ *Juego de Cirios Grandes*\n\n"
+        "Velas de ceremonia para velación y novenario. Se pueden personalizar.\n\n"
+        "💰 Costo: $400.00"
+    ),
+
+    "capilla de gobierno": (
+        "⛪ *Capilla Autorizada por Gobierno*\n\n"
+        "Velación en instalaciones con permiso de COFEPRIS y gobierno local.\n\n"
+        "💰 Costo: $2,000.00 + IVA por noche"
+    ),
+
+    "capilla particular": (
+        "🏠 *Capilla Particular*\n\n"
+        "Salones privados para velación, equipados con área de descanso y cafetería.\n\n"
+        "💰 Costo: $3,500.00 + IVA por noche"
+    ),
+
+    "traslado carretero por km": (
+        "🛣️ *Traslado Carretero por Kilómetro*\n\n"
+        "Servicio de traslado terrestre en carretera con unidad especial.\n\n"
+        "💰 Costo: Desde $35.00 por km"
+    ),
+
+    "traslado de terracería por km": (
+        "🌄 *Traslado por Terracería por Kilómetro*\n\n"
+        "Para comunidades rurales sin pavimento. Unidad adaptada para accesos difíciles.\n\n"
+        "💰 Costo: Desde $45.00 por km"
+    ),
+
+    "camión foráneo por km": (
+        "🚛 *Camión Foráneo por Kilómetro*\n\n"
+        "Traslado interestatal o foráneo para restos humanos en camión certificado.\n\n"
+        "💰 Costo: Desde $50.00 por km"
     )
 }
 
