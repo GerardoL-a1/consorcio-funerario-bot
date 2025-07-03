@@ -4,7 +4,6 @@ from twilio.twiml.messaging_response import MessagingResponse
 from planes_info import responder_plan
 import requests
 import os
-import re
 
 app = Flask(__name__)
 
@@ -23,169 +22,164 @@ def home():
 MENSAJE_BIENVENIDA = (
     "👋 *Bienvenido a Consorcio Funerario*\n\n"
     "Gracias por escribirnos.\n\n"
-    "Por favor indíquenos *en qué podemos apoyarle o brindarle información*:\n"
+    "Por favor indíquenos *en qué le gustaría recibir información o en qué podemos apoyarle*:\n"
     "- Atención inmediata por *emergencia*\n"
     "- Conocer nuestros *servicios funerarios*\n"
     "- Consultar nuestras *ubicaciones disponibles*\n\n"
     "📌 Puede escribir palabras como: *emergencia*, *planes*, *nichos*, *traslado*, *ubicación*, etc."
 )
 
-claves_planes = ["planes", "servicios", "funerarios", "plan", "sepultura", "cremacion", "legal", "biker", "plus", "consorcio", "adulto", "nichos", "fetal"]
-claves_emergencia = ["emergencia", "fallecido", "falleció", "murio", "hospital", "traslado", "recoleccion", "suceso", "defuncion"]
-claves_ubicacion = ["ubicación", "sucursal", "donde", "direccion", "ubicaciones", "están"]
-claves_menu = ["menú", "menu", "volver", "inicio", "regresar", "empezar"]
-
-submenus = {
-    "inmediato": {
-        "letras": list("ABCDEFGH"),
-        "planes": [
-            "crédito de necesidad inmediata", "servicio paquete fetal cremación",
-            "servicio paquete sencillo sepultura", "servicio paquete básico sepultura",
-            "servicio cremación directa", "servicio paquete de cremación",
-            "servicio paquete legal", "servicio de refrigeración y conservación"
-        ]
-    },
-    "futuro": {
-        "letras": list("IJKLM"),
-        "planes": [
-            "red biker", "red plus", "red consorcio",
-            "red adulto mayor", "preventa de nichos a temporalidad"
-        ]
-    },
-    "servicios": {
-        "letras": list("NOPQRSTUVWXYZ"),
-        "planes": [
-            "traslado", "ataúd", "urna", "velación", "boletas",
-            "carroza local", "carroza a panteón u horno crematorio", "carroza legal", "camión local",
-            "embalsamado", "embalsamado legal", "embalsamado infecto-contagiosa", "trámites de inhumación",
-            "trámites de cremación", "trámites legales", "trámites de traslado",
-            "trámites de internación nacional", "trámites de internación internacional",
-            "equipo de velación", "cirios", "capilla de gobierno", "capilla particular",
-            "traslado carretero por km", "traslado de terracería por km", "camión foráneo por km"
-        ]
-    }
-}
+claves_planes = ["plan", "planes", "servicio", "servicios", "paquete", "información", "informacion"]
+claves_emergencia = ["emergencia", "urgente", "fallecido", "murió", "murio", "accidente", "suceso"]
+claves_ubicacion = ["ubicación", "ubicaciones", "sucursal", "sucursales", "dirección", "direccion"]
+claves_volver = ["volver", "menú", "menu", "inicio"]
 
 def contiene(palabras, mensaje):
     return any(p in mensaje.lower() for p in palabras)
 
-def normaliza(texto):
-    return re.sub(r"[^a-z0-9áéíóúñ ]", "", texto.lower())
-
-def buscar_plan_por_clave(mensaje):
-    mensaje = normaliza(mensaje)
-    for categoria in submenus.values():
-        for plan in categoria["planes"]:
-            if any(p in mensaje for p in plan.split()):
-                return responder_plan(plan)
-    return None
-
 def responder(texto):
-    r = MessagingResponse()
-    r.message(texto)
-    return str(r)
+    respuesta = MessagingResponse()
+    respuesta.message(texto)
+    return str(respuesta)
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
-    mensaje = request.form.get("Body", "").strip().lower()
+    mensaje = request.form.get("Body", "").strip()
     telefono = request.form.get("From", "")
     estado = sesiones.get(telefono, {})
+    msj_lower = mensaje.lower()
 
-    if contiene(claves_menu, mensaje):
+    if contiene(claves_volver, msj_lower):
         sesiones[telefono] = {}
         return responder(MENSAJE_BIENVENIDA)
 
-    if "menu" not in estado:
-        if contiene(claves_emergencia, mensaje):
+    if not estado:
+        if contiene(claves_emergencia, msj_lower):
             sesiones[telefono] = {"menu": "emergencia"}
-        elif contiene(claves_planes, mensaje):
-            sesiones[telefono] = {"menu": "planes"}
-        elif contiene(claves_ubicacion, mensaje):
+            return responder(
+                "🚨 *ATENCIÓN INMEDIATA*\n\n"
+                "Por favor responde con los siguientes datos:\n"
+                "🔹 Nombre completo del fallecido\n"
+                "🔹 Suceso o causa del fallecimiento\n"
+                "🔹 Ubicación actual del cuerpo\n"
+                "🔹 Dos números de contacto\n"
+                "🔹 Nombre de la persona que nos está contactando"
+            )
+        elif contiene(claves_ubicacion, msj_lower):
             sesiones[telefono] = {"menu": "ubicacion"}
+            return responder(
+                "📍 *Ubicaciones disponibles:*\n"
+                "1. Av. Tláhuac No. 5502, Col. El Rosario, CDMX\n"
+                "2. Av. Zacatlán No. 60, Col. San Lorenzo Tezonco, CDMX\n"
+                "3. Av. Zacatlán No. 10, Col. San Lorenzo Tezonco, CDMX\n\n"
+                "¿Deseas agendar una cita en alguna de nuestras sucursales? (Sí / No)"
+            )
+        elif contiene(claves_planes, msj_lower):
+            sesiones[telefono] = {"menu": "planes"}
+            return responder(
+                "📋 *Selecciona una categoría:*\n"
+                "1. Planes de necesidad inmediata\n"
+                "2. Planes a futuro\n"
+                "3. Servicios individuales"
+            )
         else:
-            sesiones[telefono] = {"menu": "principal"}
             return responder(MENSAJE_BIENVENIDA)
 
     if estado.get("menu") == "emergencia":
-        if len(mensaje.split()) >= 5 or contiene(claves_emergencia, mensaje):
-            alerta = f"📨 *EMERGENCIA RECIBIDA*\nDesde: {telefono}\n\n{mensaje}"
-            requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
-                "To": NUMERO_REENVIO,
-                "From": "whatsapp:+14155238886",
-                "Body": alerta
-            })
-            sesiones[telefono] = {}
-            return responder("✅ Gracias. Hemos recibido tu emergencia. Un asesor te contactará de inmediato.")
-        else:
-            return responder("📝 Por favor, indícanos: nombre del fallecido, ubicación y contacto.")
-
-    if estado.get("menu") == "ubicacion":
-        sesiones[telefono] = {"menu": "ubicacion-confirmada"}
-        return responder(
-            "📍 *Ubicaciones disponibles:*\n"
-            "1. Av. Tláhuac No. 5502, Col. El Rosario, CDMX\n"
-            "2. Av. Zacatlán No. 60, Col. San Lorenzo Tezonco\n"
-            "3. Av. Zacatlán No. 10, Col. San Lorenzo Tezonco\n\n"
-            "¿Deseas agendar una cita? (Sí / No)"
-        )
-
-    if estado.get("menu") == "ubicacion-confirmada" and mensaje in ["sí", "si"]:
-        sesiones[telefono] = {"menu": "cita"}
-        return responder("📅 Indícanos día y horario para agendar tu cita.")
-
-    if estado.get("menu") == "cita":
-        aviso = f"📆 *CITA SOLICITADA*\nCliente: {telefono}\nDatos: {mensaje}"
+        alerta = f"📨 *EMERGENCIA RECIBIDA*\nMensaje: {mensaje}\nDesde: {telefono}"
         requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
             "To": NUMERO_REENVIO,
             "From": "whatsapp:+14155238886",
-            "Body": aviso
+            "Body": alerta
         })
         sesiones[telefono] = {}
-        return responder("✅ Cita registrada. Un asesor te contactará para confirmar.")
+        return responder("✅ Gracias. Hemos recibido tu emergencia. Un asesor te contactará de inmediato.")
+
+    if estado.get("menu") == "ubicacion":
+        if msj_lower in ["sí", "si"]:
+            sesiones[telefono] = {"menu": "cita"}
+            return responder(
+                "📅 *Agendemos tu cita.*\n\n"
+                "¿Qué día te gustaría visitarnos?\n"
+                "¿En qué horario podrías acudir?\n\n"
+                "Tu información será enviada a nuestro equipo."
+            )
+        else:
+            sesiones[telefono] = {}
+            return responder("✅ Gracias por consultar nuestras ubicaciones. Si necesitas otra información, escribe *menú*.")
+
+    if estado.get("menu") == "cita":
+        datos = f"📆 *CITA SOLICITADA*\nCliente: {telefono}\nDatos: {mensaje}"
+        requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
+            "To": NUMERO_REENVIO,
+            "From": "whatsapp:+14155238886",
+            "Body": datos
+        })
+        sesiones[telefono] = {}
+        return responder("✅ Gracias. Hemos registrado tu solicitud. Nuestro equipo te contactará pronto.")
 
     if estado.get("menu") == "planes":
-        for clave, grupo in submenus.items():
-            if mensaje in [clave, clave[:3]]:
-                sesiones[telefono] = {"submenu": clave}
-                letras = grupo["letras"]
-                nombres = grupo["planes"]
-                lista = "\n".join([f"{letras[i]}. {nombres[i].capitalize()}" for i in range(len(letras))])
-                return responder(f"📋 *{clave.upper()}*\n{lista}\n\nSelecciona la letra o escribe palabras clave como 'biker', 'nichos', etc.")
+        if mensaje == "1":
+            sesiones[telefono] = {"submenu": "inmediato"}
+            return responder(
+                "⏱️ *Planes de necesidad inmediata:*\n"
+                "A. Crédito de necesidad inmediata\n"
+                "B. Servicio paquete fetal cremación\n"
+                "C. Servicio paquete sencillo sepultura\n"
+                "D. Servicio paquete básico sepultura\n"
+                "E. Servicio cremación directa\n"
+                "F. Servicio paquete de cremación\n"
+                "G. Servicio paquete legal\n"
+                "H. Servicio de refrigeración y conservación\n\n"
+                "Escribe la letra correspondiente para más información."
+            )
+        elif mensaje == "2":
+            sesiones[telefono] = {"submenu": "futuro"}
+            return responder(
+                "🕰️ *Planes a futuro:*\n"
+                "I. Red Biker\n"
+                "J. Red Plus\n"
+                "K. Red Consorcio\n"
+                "L. Red Adulto Mayor\n"
+                "M. Preventa de Nichos a Temporalidad\n\n"
+                "Escribe la letra correspondiente para más información."
+            )
+        elif mensaje == "3":
+            sesiones[telefono] = {"submenu": "servicios"}
+            return responder(
+                "🧰 *Servicios individuales:*\n"
+                "N. Traslado\n"
+                "O. Ataúd\n"
+                "P. Urna\n"
+                "Q. Velación\n"
+                "R. Boletas\n"
+                "S. Carroza local\n"
+                "T. Carroza a panteón u horno crematorio\n"
+                "U. Carroza legal\n"
+                "V. Camión local\n"
+                "W. Embalsamado\n"
+                "X. Embalsamado legal\n"
+                "Y. Embalsamado infecto-contagiosa\n"
+                "Z. Trámites de inhumación\n"
+                "AA. Trámites de cremación\n"
+                "AB. Trámites legales\n"
+                "AC. Trámites de traslado\n"
+                "AD. Trámites de internación nacional\n"
+                "AE. Trámites de internación internacional\n"
+                "AF. Equipo de velación\n"
+                "AG. Cirios\n"
+                "AH. Capilla de gobierno\n"
+                "AI. Capilla particular\n"
+                "AJ. Traslado carretero por km\n"
+                "AK. Traslado de terracería por km\n"
+                "AL. Camión foráneo por km\n\n"
+                "Escribe la letra correspondiente para más información."
+            )
 
-    if "submenu" in estado:
-        grupo = submenus.get(estado["submenu"])
-        letras = grupo["letras"]
-        nombres = grupo["planes"]
-        letra = mensaje.strip().upper()[:1]
-        if letra in letras:
-            plan = nombres[letras.index(letra)]
-            respuesta = responder_plan(plan)
-            if respuesta:
-                return responder(respuesta + "\n\n✉️ Puedes consultar otro o escribir *menú*.")
-        else:
-            posible = buscar_plan_por_clave(mensaje)
-            if posible:
-                return responder(posible + "\n\n✉️ Puedes consultar otro o escribir *menú*.")
-            else:
-                intentos = estado.get("intentos", 0) + 1
-                sesiones[telefono]["intentos"] = intentos
-                if intentos == 1:
-                    return responder("❌ No reconocimos tu selección. Intenta otra letra o palabra clave del servicio que necesitas.")
-                elif intentos == 2:
-                    return responder("📌 El plan o servicio que mencionas podría estar en mantenimiento o no disponible actualmente. Si deseas más ayuda, puedes escribirnos directamente.")
-                else:
-                    if "submenu" in sesiones[telefono]:
-                        submenu = sesiones[telefono]["submenu"]
-                        letras = submenus[submenu]["letras"]
-                        nombres = submenus[submenu]["planes"]
-                        lista = "\n".join([f"{letras[i]}. {nombres[i].capitalize()}" for i in range(len(letras))])
-                        return responder(f"📋 *{submenu.upper()}*\n{lista}\n\nSelecciona la letra o escribe palabras clave como 'biker', 'nichos', etc.")
-                    else:
-                        sesiones[telefono] = {}
-                        return responder(MENSAJE_BIENVENIDA)
+    if estado.get("submenu"):
+        texto = responder_plan(msj_lower)
+        if "No entendí tu mensaje" in texto:
+            return responder("❌ No reconocimos tu selección. Intenta con otra letra o palabra clave del servicio que necesitas.")
+        return responder(texto)
 
-    posible = buscar_plan_por_clave(mensaje)
-    if posible:
-        return responder(posible + "\n\n✉️ Si deseas volver al menú, escribe *menú* o *volver*.")
-    else:
-        return responder("📌 Por favor indícanos si deseas información sobre emergencia, servicios o ubicaciones. Puedes escribir palabras como: *emergencia*, *cremación*, *nichos*, *adulto mayor*, *biker*, *ubicación*, etc.")
+    return responder(MENSAJE_BIENVENIDA)
