@@ -4,6 +4,10 @@ from twilio.twiml.messaging_response import MessagingResponse
 from planes_info import responder_plan
 import requests
 import os
+import threading
+from datetime import datetime
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
 app = Flask(__name__)
 
@@ -13,6 +17,7 @@ TWILIO_MESSAGING_URL = f"https://api.twilio.com/2010-04-01/Accounts/{TWILIO_ACCO
 TWILIO_AUTH = (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 NUMERO_REENVIO = "+525523604519"
 sesiones = {}
+temporizadores = {}
 
 @app.route("/", methods=["GET"])
 def home():
@@ -72,7 +77,7 @@ selecciones_letras = {
 claves_planes = ["plan", "planes", "servicio", "servicios", "paquete", "información", "informacion"]
 claves_emergencia = ["emergencia", "urgente", "fallecido", "murió", "murio", "accidente", "suceso"]
 claves_ubicacion = ["ubicación", "ubicaciones", "sucursal", "sucursales", "dirección", "direccion"]
-claves_volver = ["volver", "menú", "menu", "inicio"]
+claves_volver = ["volver", "menú", "menu", "inicio", "meno", "menj", "inickp", "ect", "etc"]
 claves_cierre = ["gracias", "ok", "vale", "de acuerdo", "listo", "perfecto", "entendido", "muy bien"]
 
 # CONFIGURAR GOOGLE SHEETS
@@ -188,7 +193,7 @@ def webhook():
         sesiones[telefono] = {}
         return responder("✅ Gracias. Hemos registrado tu solicitud. Nuestro equipo te contactará pronto.")
 
-   if estado.get("menu") == "planes":
+    if estado.get("menu") == "planes":
         if mensaje == "1":
             sesiones[telefono] = {"submenu": "inmediato"}
             return responder(
