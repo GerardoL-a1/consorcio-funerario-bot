@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 from flask import Flask, request
 import sys
@@ -128,6 +129,17 @@ def webhook():
         sesiones[telefono] = {}  # Reinicia la sesión
         return responder(MENSAJE_BIENVENIDA)
 
+    # Lógica para regresar al submenú
+    if msj_lower == "regresar":
+        if "submenu" in estado:
+            # Regresar al menú del submenú
+            if estado["menu"] == "planes":
+                return responder("🔙 Has regresado al submenú de planes. ¿Qué opción deseas seleccionar? Escribe *menú* para volver al menú principal.")
+            elif estado["menu"] == "ubicacion":
+                return responder("🔙 Has regresado al submenú de ubicaciones. ¿Qué opción deseas seleccionar? Escribe *menú* para volver al menú principal.")
+        else:
+            return responder("🔙 Estás en el menú principal. Escribe *menú* para volver a empezar o selecciona otra opción.")
+
     # Lógica para mensajes de cierre
     if contiene(claves_cierre, msj_lower):
         return responder("👌 Gracias por confirmar. Si necesitas algo más, puedes escribir *menú* para volver a empezar o seleccionar otra opción.")
@@ -158,7 +170,7 @@ Por favor responde con los siguientes datos:
         elif contiene(claves_planes, msj_lower):
             sesiones[telefono] = {"menu": "planes"}
             return responder(
-                "📌 Has seleccionado *servicios funerarios*. Por favor, elige una opción:\n"
+                "Has seleccionado *servicios funerarios*. Por favor, elige una opción:\n"
                 "1. Planes de necesidad inmediata\n"
                 "2. Planes a futuro\n"
                 "3. Servicios individuales\n\n"
@@ -223,7 +235,8 @@ Mensaje: {mensaje}
                     "F. Servicio paquete de cremación\n"
                     "G. Servicio paquete legal\n"
                     "H. Servicio de refrigeración y conservación\n\n"
-                    "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*"
+                    "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*\n"
+                    "🔙 Escribe 'regresar' para volver al menú de servicios."
                 )
 
             elif mensaje == "2":
@@ -235,7 +248,8 @@ Mensaje: {mensaje}
                     "K. Red Consorcio\n"
                     "L. Red Adulto Mayor\n"
                     "M. Preventa de Nichos a Temporalidad\n\n"
-                    "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*"
+                    "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*\n"
+                    "🔙 Escribe 'regresar' para volver al menú de servicios."
                 )
 
             elif mensaje == "3":
@@ -247,7 +261,8 @@ Mensaje: {mensaje}
                     "B. Traslados y Carrozas\n"
                     "C. Objetos y Equipamiento\n"
                     "D. Procedimientos Especiales\n\n"
-                    "Escribe la letra correspondiente para continuar (A, B, C o D).\n\n*Escribe '*' para regresar al menú principal.*"
+                    "Escribe la letra correspondiente para continuar (A, B, C o D).\n\n*Escribe '*' para regresar al menú principal.*\n"
+                    "🔙 Escribe 'regresar' para volver al menú de servicios."
                 )
             else:
                 return responder("❌ Opción no válida. Por favor, elige 1, 2 o 3 para seleccionar un tipo de plan o escribe *menú* para volver al inicio.")
@@ -277,7 +292,8 @@ Mensaje: {mensaje}
                         "AC. Trámites de traslado\n"
                         "AD. Trámites de internación nacional\n"
                         "AE. Trámites de internación internacional\n\n"
-                        "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*"
+                        "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*\n"
+                                                "🔙 Escribe 'regresar' para volver al menú de servicios."
                     )
                 elif letra == "B":
                     sesiones[telefono]["menu_serv"] = "traslados"
@@ -291,7 +307,8 @@ Mensaje: {mensaje}
                         "AJ. Traslado carretero por km\n"
                         "AK. Traslado de terracería por km\n"
                         "AL. Camión foráneo por km\n\n"
-                        "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*"
+                        "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*\n"
+                        "🔙 Escribe 'regresar' para volver al menú de servicios."
                     )
                 elif letra == "C":
                     sesiones[telefono]["menu_serv"] = "equipamiento"
@@ -303,7 +320,8 @@ Mensaje: {mensaje}
                         "AG. Cirios\n"
                         "AH. Capilla de gobierno\n"
                         "AI. Capilla particular\n\n"
-                        "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*"
+                        "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*\n"
+                        "🔙 Escribe 'regresar' para volver al menú de servicios."
                     )
                 elif letra == "D":
                     sesiones[telefono]["menu_serv"] = "procedimientos"
@@ -314,7 +332,8 @@ Mensaje: {mensaje}
                         "W. Embalsamado\n"
                         "X. Embalsamado legal\n"
                         "Y. Embalsamado infecto-contagiosa\n\n"
-                        "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*"
+                        "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*\n"
+                        "🔙 Escribe 'regresar' para volver al menú de servicios."
                     )
                 else:
                     return responder("❌ Opción no válida. Por favor escribe A, B, C o D para seleccionar una categoría.")
