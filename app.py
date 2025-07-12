@@ -1,13 +1,15 @@
-z# -*- coding: utf-8 -*-
+
+# -*- coding: utf-8 -*-
 from flask import Flask, request
 import sys
 import io
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-from twilio.twiml.messaging_response import MessagingResponse
-from planes_info import responder_plan
 import requests
 import os
 import threading
+from twilio.twiml.messaging_response import MessagingResponse
+from planes_info import responder_plan
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 app = Flask(__name__)
 
@@ -145,7 +147,6 @@ def webhook():
 
 {mensaje}
 
-
 """
 
         # Enviar a número principal
@@ -185,65 +186,37 @@ def webhook():
         if mensaje == "1":
             sesiones[telefono] = {"submenu": "inmediato"}
             return responder(
-    "⏱️ *Planes de necesidad inmediata:*\n"
-    "A. Crédito de necesidad inmediata\n"
-    "B. Servicio paquete fetal cremación\n"
-    "C. Servicio paquete sencillo sepultura\n"
-    "D. Servicio paquete básico sepultura\n"
-    "E. Servicio cremación directa\n"
-    "F. Servicio paquete de cremación\n"
-    "G. Servicio paquete legal\n"
-    "H. Servicio de refrigeración y conservación\n\n"
-    "📝 Escribe la letra correspondiente para más información o *volver* para regresar."
-)
+                "⏱️ *Planes de necesidad inmediata:*\n"
+                "A. Crédito de necesidad inmediata\n"
+                "B. Servicio paquete fetal cremación\n"
+                "C. Servicio paquete sencillo sepultura\n"
+                "D. Servicio paquete básico sepultura\n"
+                "E. Servicio cremación directa\n"
+                "F. Servicio paquete de cremación\n"
+                "G. Servicio paquete legal\n"
+                "H. Servicio de refrigeración y conservación\n\n"
+                "📝 Escribe la letra correspondiente para más información o *volver* para regresar."
+            )
 
         elif mensaje == "2":
             sesiones[telefono] = {"submenu": "futuro"}
-            return responder("🕰️ *Planes a futuro:*
-I. Red Biker
-J. Red Plus
-K. Red Consorcio
-L. Red Adulto Mayor
-M. Preventa de Nichos a Temporalidad
-
-📝 Escribe la letra correspondiente para más información o *volver* para regresar.")")
+            return responder(
+                "🕰️ *Planes a futuro:*\n"
+                "I. Red Biker\n"
+                "J. Red Plus\n"
+                "K. Red Consorcio\n"
+                "L. Red Adulto Mayor\n"
+                "M. Preventa de Nichos a Temporalidad\n\n"
+                "📝 Escribe la letra correspondiente para más información o *volver* para regresar."
+            )
 
         elif mensaje == "3":
             sesiones[telefono] = {"submenu": "servicios", "menu_serv": "categorias"}
             return responder(
-    "☝🏻️ *Servicios Individuales* - Selecciona una categoría:\n\n"
-    "C. Objetos y Equipamiento\n\n"
-    "Escribe la letra correspondiente para continuar (A, B, C o D)."
-)
-            return responder(
-    "☝🏻️ *Servicios individuales:*\n"
-    "N. Traslado\n"
-    "O. Ataúd\n"
-    "P. Urna\n"
-    "Q. Velación\n"
-    "R. Boletas\n"
-    "S. Carroza local\n"
-    "T. Carroza a panteón u horno crematorio\n"
-    "U. Carroza legal\n"
-    "V. Camión local\n"
-    "W. Embalsamado\n"
-    "X. Embalsamado legal\n"
-    "Y. Embalsamado infecto-contagiosa\n"
-    "Z. Trámites de inhumación\n"
-    "AA. Trámites de cremación\n"
-    "AB. Trámites legales\n"
-    "AC. Trámites de traslado\n"
-    "AD. Trámites de internación nacional\n"
-    "AE. Trámites de internación internacional\n"
-    "AF. Equipo de velación\n"
-    "AG. Cirios\n"
-    "AH. Capilla de gobierno\n"
-    "AI. Capilla particular\n"
-    "AJ. Traslado carretero por km\n"
-    "AK. Traslado de terracería por km\n"
-    "AL. Camión foráneo por km\n\n"
-    "📝 Escribe la letra correspondiente para más información o *volver* para regresar."
-)
+                "☝🏻️ *Servicios Individuales* - Selecciona una categoría:\n\n"
+                "C. Objetos y Equipamiento\n\n"
+                "Escribe la letra correspondiente para continuar (A, B, C o D)."
+            )
 
     if estado.get("submenu"):
         letra = mensaje.strip().replace(" ", "")
@@ -261,69 +234,52 @@ M. Preventa de Nichos a Temporalidad
             if letra == "A":
                 sesiones[telefono]["menu_serv"] = "tramites"
                 return responder(
-    "📜 *Trámites y Papelería:*
-"
-    "Z. Trámites de inhumación
-"
-    "AA. Trámites de cremación
-"
-    "AB. Trámites legales
-"
-    "AC. Trámites de traslado
-"
-    "AD. Trámites de internación nacional
-"
-    "AE. Trámites de internación internacional
-
-"
-    "📝 Escribe la letra correspondiente para más información o *volver* para regresar."
-)
+                    "📜 *Trámites y Papelería:*\n"
+                    "Z. Trámites de inhumación\n"
+                    "AA. Trámites de cremación\n"
+                    "AB. Trámites legales\n"
+                    "AC. Trámites de traslado\n"
+                    "AD. Trámites de internación nacional\n"
+                    "AE. Trámites de internación internacional\n\n"
+                    "📝 Escribe la letra correspondiente para más información o *volver* para regresar."
+                )
             elif letra == "B":
                 sesiones[telefono]["menu_serv"] = "traslados"
                 return responder(
-    "🚚 *Traslados y Carrozas:*
-"
-    "N. Traslado  
-"
-    "S. Carroza local  
-"
-    "T. Carroza a panteón u horno crematorio  
-"
-    "U. Carroza legal  
-"
-    "V. Camión local  
-"
-    "AJ. Traslado carretero por km  
-"
-    "AK. Traslado de terracería por km  
-"
-    "AL. Camión foráneo por km
-
-"
-    "📝  Escribe la letra correspondiente para más información o *volver* para regresar."
-)
-📝  Escribe la letra correspondiente para más información o *volver* para regresar.""")
+                    "🚚 *Traslados y Carrozas:*\n"
+                    "N. Traslado\n"
+                    "S. Carroza local\n"
+                    "T. Carroza a panteón u horno crematorio\n"
+                    "U. Carroza legal\n"
+                    "V. Camión local\n"
+                    "AJ. Traslado carretero por km\n"
+                    "AK. Traslado de terracería por km\n"
+                    "AL. Camión foráneo por km\n\n"
+                    "📝 Escribe la letra correspondiente para más información o *volver* para regresar."
+                )
             elif letra == "C":
                 sesiones[telefono]["menu_serv"] = "equipamiento"
-                return responder("""🛄 *Objetos y Equipamiento:*
-O. Ataúd  
-P. Urna  
-AF. Equipo de velación  
-AG. Cirios  
-AH. Capilla de gobierno  
-AI. Capilla particular
-
-📝  Escribe la letra correspondiente para más información o *volver* para regresar.""")
+                return responder(
+                    "🛄 *Objetos y Equipamiento:*\n"
+                    "O. Ataúd\n"
+                    "P. Urna\n"
+                    "AF. Equipo de velación\n"
+                    "AG. Cirios\n"
+                    "AH. Capilla de gobierno\n"
+                    "AI. Capilla particular\n\n"
+                    "📝 Escribe la letra correspondiente para más información o *volver* para regresar."
+                )
             elif letra == "D":
                 sesiones[telefono]["menu_serv"] = "procedimientos"
-                return responder("""🧪 *Procedimientos Especiales:*
-Q. Velación  
-R. Boletas  
-W. Embalsamado  
-X. Embalsamado legal  
-Y. Embalsamado infecto-contagiosa
-
-📝  Escribe la letra correspondiente para más información o *volver* para regresar.""")
+                return responder(
+                    "🧪 *Procedimientos Especiales:*\n"
+                    "Q. Velación\n"
+                    "R. Boletas\n"
+                    "W. Embalsamado\n"
+                    "X. Embalsamado legal\n"
+                    "Y. Embalsamado infecto-contagiosa\n\n"
+                    "📝 Escribe la letra correspondiente para más información o *volver* para regresar."
+                )
             else:
                 return responder("❌ Opción no válida. Por favor escribe A, B, C o D para seleccionar una categoría.")
 
@@ -336,4 +292,5 @@ Y. Embalsamado infecto-contagiosa
 
     return responder(MENSAJE_BIENVENIDA)
 
-return responder(MENSAJE_BIENVENIDA)
+if __name__ == "__main__":
+    app.run(debug=True)
