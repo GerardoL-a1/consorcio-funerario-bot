@@ -7,7 +7,7 @@ import requests
 import os
 import threading
 from twilio.twiml.messaging_response import MessagingResponse
-from planes_info import responder_plan # Asegúrate de que este módulo exista y funcione correctamente
+from planes_info import responder_plan
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
@@ -17,7 +17,7 @@ TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_MESSAGING_URL = f"https://api.twilio.com/2010-04-01/Accounts/{TWILIO_ACCOUNT_SID}/Messages.json"
 TWILIO_AUTH = (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-NUMERO_REENVIO = "+525523604519" # Número principal para reenvío de emergencias/citas
+NUMERO_REENVIO = "+525523604519"
 
 sesiones = {}
 temporizadores = {}
@@ -125,27 +125,24 @@ def webhook():
     temporizadores[telefono] = temporizador
 
     # Lógica para volver al menú principal
-    if contiene(claves_volver, msj_lower):
-        sesiones[telefono] = {} # Reinicia la sesión
+    if msj_lower == "*":
+        sesiones[telefono] = {}  # Reinicia la sesión
         return responder(MENSAJE_BIENVENIDA)
 
     # Lógica para mensajes de cierre
     if contiene(claves_cierre, msj_lower):
-        # No reinicia la sesión aquí, permite que el usuario continúe o inicie una nueva conversación
         return responder("Gracias por confirmar. Si necesitas algo más, puedes escribir *menú* para volver a empezar o seleccionar otra opción.")
 
     # Lógica principal del bot basada en el estado de la sesión
-    if not estado: # Si no hay estado, es la primera interacción o la sesión se reinició
+    if not estado:  # Si no hay estado, es la primera interacción o la sesión se reinició
         if contiene(claves_emergencia, msj_lower):
             sesiones[telefono] = {"menu": "emergencia"}
-            # No respondemos aquí, la respuesta se manejará en el siguiente bloque
             return responder("Has seleccionado *emergencia*. Por favor, describe brevemente la situación para que podamos ayudarte de inmediato.")
             
         elif contiene(claves_ubicacion, msj_lower):
             sesiones[telefono] = {"menu": "ubicacion"}
-            # Aquí podrías dar la información de ubicación directamente o preguntar si desea una cita
-            return responder("Nuestras ubicaciones principales son: [Dirección 1], [Dirección 2]. ¿Te gustaría agendar una cita para visitarnos? Responde 'sí' o 'no'.")
-            
+            return responder("Nuestras ubicaciones principales son: [Dirección 1], [Dirección 2]. ¿Te gustaría agendar una cita para visitarnos? Responde 'sí' o 'no'.\n\n*Escribe '*' para regresar al menú principal.")
+
         elif contiene(claves_planes, msj_lower):
             sesiones[telefono] = {"menu": "planes"}
             return responder(
@@ -153,15 +150,13 @@ def webhook():
                 "1. Planes de necesidad inmediata\n"
                 "2. Planes a futuro\n"
                 "3. Servicios individuales\n\n"
-                "📝 Escribe el número de la opción deseada."
+                "📝 Escribe el número de la opción deseada.\n\n*Escribe '*' para regresar al menú principal."
             )
         else:
-            # Si el mensaje no coincide con ninguna palabra clave inicial, muestra el menú de bienvenida
             return responder(MENSAJE_BIENVENIDA)
 
     # Manejo de estados específicos
     if estado.get("menu") == "emergencia":
-        # El mensaje del usuario es la descripción de la emergencia
         alerta = f"""📨 *NUEVA EMERGENCIA FUNERARIA*
 De: {telefono}
 Mensaje: {mensaje}
@@ -175,38 +170,35 @@ Mensaje: {mensaje}
 
         # Enviar a número secundario (si aplica)
         requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
-            "To": "+525523680734", # Asegúrate de que este número sea correcto
+            "To": "+525523680734",  # Asegúrate de que este número sea correcto
             "From": "whatsapp:+14155238886",
             "Body": alerta
         })
-        sesiones[telefono] = {} # Reinicia la sesión después de manejar la emergencia
+        sesiones[telefono] = {}  # Reinicia la sesión después de manejar la emergencia
         return responder("✅ Gracias. Hemos recibido tu emergencia. Un asesor te contactará de inmediato.")
 
     if estado.get("menu") == "ubicacion":
         if msj_lower in ["sí", "si", "si me gustaría", "si quiero"]:
-            sesiones[telefono]["menu"] = "cita" # Cambia el estado a "cita"
-            return responder("Perfecto. Por favor, indícanos tu nombre y un horario preferido para la cita.")
+            sesiones[telefono]["menu"] = "cita"  # Cambia el estado a "cita"
+            return responder("Perfecto. Por favor, indícanos tu nombre y un horario preferido para la cita.\n\n*Escribe '*' para regresar al menú principal.")
         elif msj_lower in ["no", "no gracias", "no por ahora"]:
-            sesiones[telefono] = {} # Reinicia la sesión si no quiere cita
+            sesiones[telefono] = {}  # Reinicia la sesión si no quiere cita
             return responder("✅ Gracias por consultar nuestras ubicaciones. Si necesitas otra información, escribe *menú*.")
         else:
-            # Si el usuario no responde 'sí' o 'no' claramente, repite la pregunta o guía
-            return responder("No entendí tu respuesta. ¿Te gustaría agendar una cita para visitarnos? Responde 'sí' o 'no'.")
+            return responder("No entendí tu respuesta. ¿Te gustaría agendar una cita para visitarnos? Responde 'sí' o 'no'.\n\n*Escribe '*' para regresar al menú principal.")
 
     if estado.get("menu") == "cita":
-        # El mensaje del usuario es la información para la cita
         datos = f"📆 *CITA SOLICITADA*\nCliente: {telefono}\nDatos: {mensaje}"
         requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
             "To": NUMERO_REENVIO,
             "From": "whatsapp:+14155238886",
             "Body": datos
         })
-        sesiones[telefono] = {} # Reinicia la sesión después de registrar la cita
-        return responder("✅ Gracias. Hemos registrado tu solicitud de cita. Nuestro equipo te contactará pronto para confirmar.")
+        sesiones[telefono] = {}  # Reinicia la sesión después de registrar la cita
+        return responder("✅ Gracias. Hemos registrado tu solicitud de cita. Nuestro equipo te contactará pronto.\n\n*Escribe '*' para regresar al menú principal.")
 
     if estado.get("menu") == "planes":
-        # Si el usuario ya está en el menú de planes, procesa su selección
-        if "submenu" not in estado: # Si aún no ha elegido un submenú de planes
+        if "submenu" not in estado:  # Si aún no ha elegido un submenú de planes
             if mensaje == "1":
                 sesiones[telefono]["submenu"] = "inmediato"
                 return responder(
@@ -219,8 +211,9 @@ Mensaje: {mensaje}
                     "F. Servicio paquete de cremación\n"
                     "G. Servicio paquete legal\n"
                     "H. Servicio de refrigeración y conservación\n\n"
-                    "📝 Escribe la letra correspondiente para más información o *volver* para regresar."
+                    "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*"
                 )
+
             elif mensaje == "2":
                 sesiones[telefono]["submenu"] = "futuro"
                 return responder(
@@ -230,18 +223,19 @@ Mensaje: {mensaje}
                     "K. Red Consorcio\n"
                     "L. Red Adulto Mayor\n"
                     "M. Preventa de Nichos a Temporalidad\n\n"
-                    "📝 Escribe la letra correspondiente para más información o *volver* para regresar."
+                    "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*"
                 )
+
             elif mensaje == "3":
                 sesiones[telefono]["submenu"] = "servicios"
-                sesiones[telefono]["menu_serv"] = "categorias" # Establece el estado para la selección de categorías de servicios
+                sesiones[telefono]["menu_serv"] = "categorias"  # Establece el estado para la selección de categorías de servicios
                 return responder(
                     "☝🏻️ *Servicios Individuales* - Selecciona una categoría:\n\n"
                     "A. Trámites y Papelería\n"
                     "B. Traslados y Carrozas\n"
                     "C. Objetos y Equipamiento\n"
                     "D. Procedimientos Especiales\n\n"
-                    "Escribe la letra correspondiente para continuar (A, B, C o D)."
+                    "Escribe la letra correspondiente para continuar (A, B, C o D).\n\n*Escribe '*' para regresar al menú principal.*"
                 )
             else:
                 return responder("❌ Opción no válida. Por favor, elige 1, 2 o 3 para seleccionar un tipo de plan o escribe *menú* para volver al inicio.")
@@ -251,8 +245,8 @@ Mensaje: {mensaje}
             letra = mensaje.strip().replace(" ", "")
             if letra in selecciones_letras:
                 clave = selecciones_letras[letra]
-                respuesta = responder_plan(clave) # Asume que responder_plan devuelve el texto del plan
-                sesiones[telefono] = {} # Reinicia la sesión después de dar la información del plan
+                respuesta = responder_plan(clave)  # Asume que responder_plan devuelve el texto del plan
+                sesiones[telefono] = {}  # Reinicia la sesión después de dar la información del plan
                 return responder(respuesta + "\n\nSi necesitas algo más, escribe *menú* para volver al inicio.")
             else:
                 return responder("❌ No reconocimos tu selección. Intenta con otra letra o escribe *volver* para regresar al menú de planes.")
@@ -271,7 +265,7 @@ Mensaje: {mensaje}
                         "AC. Trámites de traslado\n"
                         "AD. Trámites de internación nacional\n"
                         "AE. Trámites de internación internacional\n\n"
-                        "📝 Escribe la letra correspondiente para más información o *volver* para regresar."
+                        "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*"
                     )
                 elif letra == "B":
                     sesiones[telefono]["menu_serv"] = "traslados"
@@ -285,7 +279,7 @@ Mensaje: {mensaje}
                         "AJ. Traslado carretero por km\n"
                         "AK. Traslado de terracería por km\n"
                         "AL. Camión foráneo por km\n\n"
-                        "📝 Escribe la letra correspondiente para más información o *volver* para regresar."
+                        "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*"
                     )
                 elif letra == "C":
                     sesiones[telefono]["menu_serv"] = "equipamiento"
@@ -297,7 +291,7 @@ Mensaje: {mensaje}
                         "AG. Cirios\n"
                         "AH. Capilla de gobierno\n"
                         "AI. Capilla particular\n\n"
-                        "📝 Escribe la letra correspondiente para más información o *volver* para regresar."
+                        "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*"
                     )
                 elif letra == "D":
                     sesiones[telefono]["menu_serv"] = "procedimientos"
@@ -308,7 +302,7 @@ Mensaje: {mensaje}
                         "W. Embalsamado\n"
                         "X. Embalsamado legal\n"
                         "Y. Embalsamado infecto-contagiosa\n\n"
-                        "📝 Escribe la letra correspondiente para más información o *volver* para regresar."
+                        "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*"
                     )
                 else:
                     return responder("❌ Opción no válida. Por favor escribe A, B, C o D para seleccionar una categoría.")
@@ -316,12 +310,12 @@ Mensaje: {mensaje}
             elif estado.get("menu_serv") in ["tramites", "traslados", "equipamiento", "procedimientos"]:
                 if letra in selecciones_letras:
                     clave = selecciones_letras[letra]
-                    respuesta = responder_plan(clave) # Asume que responder_plan devuelve el texto del servicio
-                    sesiones[telefono] = {} # Reinicia la sesión después de dar la información del servicio
+                    respuesta = responder_plan(clave)  # Asume que responder_plan devuelve el texto del servicio
+                    sesiones[telefono] = {}  # Reinicia la sesión después de dar la información del servicio
                     return responder(respuesta + "\n\nSi necesitas algo más, escribe *menú* para volver al inicio.")
                 else:
                     return responder("❌ Letra no reconocida. Intenta de nuevo o escribe *volver* para regresar.")
-    
+
     # Si el mensaje no fue manejado por ningún estado específico, o si el estado es inválido,
     # se devuelve al menú principal. Esto actúa como un "catch-all".
     return responder(MENSAJE_BIENVENIDA)
