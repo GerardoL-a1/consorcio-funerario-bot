@@ -142,7 +142,7 @@ Por favor responde con los siguientes datos:
 🔹 Nombre completo del fallecido
 🔹 Suceso o causa del fallecimiento
 🔹 Ubicación actual del cuerpo
-🔹¿Ya cuenta con su certificado de defunción?
+🔹 ¿Ya cuenta con su certificado de defunción?
 🔹 Dos números de contacto
 🔹 Nombre de la persona que nos está contactando""")
             
@@ -158,7 +158,7 @@ Por favor responde con los siguientes datos:
         elif contiene(claves_planes, msj_lower):
             sesiones[telefono] = {"menu": "planes"}
             return responder(
-                "Has seleccionado *servicios funerarios*. Por favor, elige una opción:\n"
+                "📌 Has seleccionado *servicios funerarios*. Por favor, elige una opción:\n"
                 "1. Planes de necesidad inmediata\n"
                 "2. Planes a futuro\n"
                 "3. Servicios individuales\n\n"
