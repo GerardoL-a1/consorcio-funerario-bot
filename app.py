@@ -1,3 +1,4 @@
+
 z# -*- coding: utf-8 -*-
 from flask import Flask, request
 import sys
@@ -210,11 +211,11 @@ Escribe la letra correspondiente para más información.")
 
         elif mensaje == "3":
             sesiones[telefono] = {"submenu": "servicios", "menu_serv": "categorias"}
-            return responder("""☝🏻️ *Servicios Individuales* - Selecciona una categoría:
-
-C. Objetos y Equipamiento  
-
-Escribe la letra correspondiente para continuar (A, B, C o D).""")
+            return responder(
+    "☝🏻️ *Servicios Individuales* - Selecciona una categoría:\n\n"
+    "C. Objetos y Equipamiento\n\n"
+    "Escribe la letra correspondiente para continuar (A, B, C o D)."
+)
             return responder(
     "☝🏻️ *Servicios individuales:*\n"
     "N. Traslado\n"
@@ -317,3 +318,4 @@ Y. Embalsamado infecto-contagiosa
                 return responder("❌ Letra no reconocida. Intenta de nuevo o escribe *volver* para regresar.")
 
     return responder(MENSAJE_BIENVENIDA)
+    
