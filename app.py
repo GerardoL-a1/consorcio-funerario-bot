@@ -1,4 +1,4 @@
-z# -*- coding: utf-8 -*-
+
 from flask import Flask, request
 import sys
 import io
