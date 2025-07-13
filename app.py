@@ -8,7 +8,7 @@ import os
 import threading
 import logging
 from twilio.twiml.messaging_response import MessagingResponse
-from planes_info import responder_plan
+from planes_info import responder_plan  # Asegúrate de que este archivo exista y tenga la función responder_plan
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
@@ -17,11 +17,12 @@ app = Flask(__name__)
 # Configura el logging
 logging.basicConfig(level=logging.INFO)
 
+# Variables de entorno para Twilio
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_MESSAGING_URL = f"https://api.twilio.com/2010-04-01/Accounts/{TWILIO_ACCOUNT_SID}/Messages.json"
 TWILIO_AUTH = (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-NUMERO_REENVIO = "+525523604519"
+NUMERO_REENVIO = "+525523604519"  # Cambia este número por el que desees recibir los mensajes
 
 sesiones = {}
 temporizadores = {}
@@ -306,11 +307,12 @@ Mensaje: {mensaje}
                         "🚚 *Traslados y Carrozas:*\n"
                         "N. Traslado\n"
                         "S. Carroza local\n"
-                        "T. Carroza a panteón u horno crematorio\n"
+                        "T. Carroza a panteón"
+                        "u horno crematorio\n"
                         "U. Carroza legal\n"
                         "V. Camión local\n"
                         "AJ. Traslado carretero por km\n"
-                        "AK. Traslado de terracería por km\n"                      
+                        "AK. Traslado de terracería por km\n"
                         "AL. Camión foráneo por km\n\n"
                         "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*\n"
                         "🔙 Escribe 'regresar' para volver al menú de servicios."
