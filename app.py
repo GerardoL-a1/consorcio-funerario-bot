@@ -79,6 +79,14 @@ def mensaje_inactividad(numero):
 def parecido(palabra_objetivo, mensaje, umbral=0.75):
     """Detecta si una palabra es suficientemente parecida al mensaje recibido."""
     return SequenceMatcher(None, palabra_objetivo.lower(), mensaje.lower()).ratio() >= umbral
+    
+def contiene_flexible(lista_claves, mensaje_usuario, umbral=0.75):
+    """Devuelve True si el mensaje es similar a alguna palabra clave."""
+    mensaje_usuario = mensaje_usuario.strip().lower()
+    for palabra_clave in lista_claves:
+        if parecido(palabra_clave, mensaje_usuario, umbral):
+            return True
+    return False
 
 def es_mensaje_menu(mensaje):
     return (
