@@ -310,7 +310,7 @@ Mensaje: {mensaje}
                         "U. Carroza legal\n"
                         "V. Camión local\n"
                         "AJ. Traslado carretero por km\n"
-                        "AK. Traslado de terracería por km\n                        
+                        "AK. Traslado de terracería por km\n"                      
                         "AL. Camión foráneo por km\n\n"
                         "📝 Escribe la letra correspondiente para más información o *escribe '*' para regresar al menú principal.*\n"
                         "🔙 Escribe 'regresar' para volver al menú de servicios."
