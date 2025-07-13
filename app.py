@@ -40,7 +40,6 @@ Por favor indíquenos *en qué le gustaría recibir información o en qué podem
 - Consultar nuestras *ubicaciones disponibles*
 
 📌 Puede escribir palabras como: *emergencia*, *planes*, *servicios*, *ubicación*, etc."""
-"🔙 Escribe 'regresar' para volver al menú de servicios."
 
 # Diccionario de letras -> servicio
 selecciones_letras = {
@@ -162,7 +161,8 @@ Por favor responde con los siguientes datos:
 🔹 Ubicación actual del cuerpo
 🔹 ¿Ya cuenta con su certificado de defunción?
 🔹 Dos números de contacto
-🔹 Nombre de la persona que nos está contactando""")
+🔹 Nombre de la persona que nos está contactando"""
+"🔙 Escribe 'regresar' para volver al menú de servicios.")
             
         elif contiene(claves_ubicacion, mensaje.lower()):
             sesiones[telefono] = {"menu": "ubicacion"}
