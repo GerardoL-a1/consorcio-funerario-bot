@@ -162,7 +162,8 @@ Por favor responde con los siguientes datos:
 🔹 ¿Ya cuenta con su certificado de defunción?
 🔹 Dos números de contacto
 🔹 Nombre de la persona que nos está contactando"""
-"🔙 Escribe 'regresar' para volver al menú de servicios.")
+"🔙 Escribe 'regresar' para volver al menú de servicios."
+                            )
             
         elif contiene(claves_ubicacion, mensaje.lower()):
             sesiones[telefono] = {"menu": "ubicacion"}
