@@ -161,9 +161,7 @@ Por favor responde con los siguientes datos:
 🔹 Ubicación actual del cuerpo
 🔹 ¿Ya cuenta con su certificado de defunción?
 🔹 Dos números de contacto
-🔹 Nombre de la persona que nos está contactando"""
-"🔙 Escribe 'regresar' para volver al menú de servicios."
-                            )
+🔹 Nombre de la persona que nos está contactando""")
             
         elif contiene(claves_ubicacion, mensaje.lower()):
             sesiones[telefono] = {"menu": "ubicacion"}
@@ -206,27 +204,17 @@ Mensaje: {mensaje}
             "Body": alerta
         })
         sesiones[telefono] = {}  # Reinicia la sesión después de manejar la emergencia
-        return responder("✅ Gracias. Hemos recibido tu emergencia. Un asesor te contactará de inmediato.")
+        return responder("✅ Gracias. Hemos recibido tu emergencia. Un asesor te contactará de inmediato.\n\nSi deseas regresar al menú principal, escribe *menú*.")
 
     if sesiones[telefono].get("menu") == "ubicacion":
         if mensaje.lower() in ["sí", "si", "si me gustaría", "si quiero"]:
             sesiones[telefono]["menu"] = "cita"  # Cambia el estado a "cita"
-            return responder("Perfecto. Por favor, indícanos tu nombre y un horario preferido para la cita.\n\n*Escribe '*' para regresar al menú principal.")
+            return responder("Perfecto. Por favor, indícanos tu nombre y un horario preferido para la cita.\n\n*Escribe 'menú' para regresar al menú principal.*")
         elif mensaje.lower() in ["no", "no gracias", "no por ahora"]:
             sesiones[telefono] = {}  # Reinicia la sesión si no quiere cita
             return responder("✅ Gracias por consultar nuestras ubicaciones. Si necesitas otra información, escribe *menú*.")
         else:
-            return responder("No entendí tu respuesta. ¿Te gustaría agendar una cita para visitarnos? Responde 'sí' o 'no'.\n\n*Escribe '*' para regresar al menú principal.")
-
-    if sesiones[telefono].get("menu") == "cita":
-        datos = f"📆 *CITA SOLICITADA*\nCliente: {telefono}\nDatos: {mensaje}"
-        requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
-            "To": NUMERO_REENVIO,
-            "From": "whatsapp:+14155238886",
-            "Body": datos
-        })
-        sesiones[telefono] = {}  # Reinicia la sesión después de registrar la cita
-        return responder("✅ Gracias. Hemos registrado tu solicitud de cita. Nuestro equipo te contactará pronto.\n\n*Escribe '*' para regresar al menú principal.")
+            return responder("No entendí tu respuesta. ¿Te gustaría agendar una cita para visitarnos? Responde 'sí' o 'no'.\n\n*Escribe 'menú' para regresar al menú principal.")
 
     if sesiones[telefono].get("menu") == "planes":
         if "submenu" not in sesiones[telefono]:  # Si aún no ha elegido un submenú de planes
@@ -283,7 +271,7 @@ Mensaje: {mensaje}
                 sesiones[telefono] = {}  # Reinicia la sesión después de dar la información del plan
                 return responder(respuesta + "\n\nSi necesitas algo más, escribe *menú* para volver al inicio.")
             else:
-                return responder("❌ No reconocimos tu selección. Intenta con otra letra o escribe *volver* para regresar al menú de planes.")
+                return responder("❌ No reconocimos tu selección. Intenta con otra letra o escribe *menú* para regresar al menú principal.")
 
         elif sesiones[telefono].get("submenu") == "servicios":
             letra = mensaje.strip().upper()
@@ -308,8 +296,7 @@ Mensaje: {mensaje}
                         "🚚 *Traslados y Carrozas:*\n"
                         "N. Traslado\n"
                         "S. Carroza local\n"
-                        "T. Carroza a panteón"
-                        "u horno crematorio\n"
+                        "T. Carroza a panteón u horno crematorio\n"
                         "U. Carroza legal\n"
                         "V. Camión local\n"
                         "AJ. Traslado carretero por km\n"
@@ -353,7 +340,7 @@ Mensaje: {mensaje}
                     sesiones[telefono] = {}  # Reinicia la sesión después de dar la información del servicio
                     return responder(respuesta + "\n\nSi necesitas algo más, escribe *menú* para volver al inicio.")
                 else:
-                    return responder("❌ Letra no reconocida. Intenta de nuevo o escribe *volver* para regresar.")
+                    return responder("❌ Letra no reconocida. Intenta de nuevo o escribe *menú* para regresar.")
 
     # Si el mensaje no fue manejado por ningún estado específico, o si el estado es inválido,
     # se devuelve al menú principal. Esto actúa como un "catch-all".
