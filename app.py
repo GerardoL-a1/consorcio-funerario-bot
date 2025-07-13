@@ -40,6 +40,7 @@ Por favor indíquenos *en qué le gustaría recibir información o en qué podem
 - Consultar nuestras *ubicaciones disponibles*
 
 📌 Puede escribir palabras como: *emergencia*, *planes*, *servicios*, *ubicación*, etc."""
+"🔙 Escribe 'regresar' para volver al menú de servicios."
 
 # Diccionario de letras -> servicio
 selecciones_letras = {
