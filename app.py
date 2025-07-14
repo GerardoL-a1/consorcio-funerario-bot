@@ -52,6 +52,8 @@ claves_ubicacion = ["ubicación", "ubicaciones", "sucursal", "sucursales", "dire
 claves_cierre = ["gracias", "ok", "vale", "de acuerdo", "listo", "perfecto", "entendido", "muy bien"]
 
 # Diccionario de letras -> servicio (Aseguramos que las claves sean mayúsculas para una comparación consistente)
+# Se mantiene la lógica de que las claves en este diccionario son las que se usan para buscar en planes_info.py
+# La conversión a mayúsculas/minúsculas se maneja en la entrada del usuario.
 selecciones_letras = {
     "A": "crédito de necesidad inmediata", "B": "servicio paquete fetal cremación",
     "C": "servicio paquete sencillo sepultura", "D": "servicio paquete básico sepultura",
@@ -108,10 +110,11 @@ def contiene_flexible(lista_claves, mensaje_usuario, umbral=0.75):
     return False
 
 def es_mensaje_menu(mensaje):
+    # Añadimos 'menu' sin acento explícitamente para mayor robustez
     return (
         mensaje.strip().lower() in ["menú", "menu", "menù", "inicio", "menuh", "inicioo", "home"]
         or parecido("menú", mensaje)
-        or parecido("menu", mensaje)
+        or parecido("menu", mensaje) # Aseguramos que "menu" sin acento sea detectado
     )
 
 def es_mensaje_regresar(mensaje):
@@ -261,8 +264,11 @@ Mensaje: {mensaje}
     # FLUJO: PLANES
     # ----------------------------- #
     if sesiones[telefono].get("menu") == "planes":
+        # Normalizamos el mensaje para la comparación numérica
+        mensaje_normalizado = mensaje.strip()
+
         if "submenu" not in sesiones[telefono]: # Si aún no ha elegido un submenú de planes (1, 2 o 3)
-            if mensaje == "1":
+            if mensaje_normalizado == "1":
                 sesiones[telefono]["submenu"] = "inmediato"
                 return responder(
                     "⏱️ *Planes de necesidad inmediata:*\n"
@@ -279,7 +285,7 @@ Mensaje: {mensaje}
                     "📌 Escribe *menú* para regresar al inicio."
                 )
 
-            elif mensaje == "2":
+            elif mensaje_normalizado == "2":
                 sesiones[telefono]["submenu"] = "futuro"
                 return responder(
                     "🕰️ *Planes a futuro:*\n"
@@ -293,7 +299,7 @@ Mensaje: {mensaje}
                     "📌 Escribe *menú* para regresar al inicio."
                 )
 
-            elif mensaje == "3":
+            elif mensaje_normalizado == "3":
                 sesiones[telefono]["submenu"] = "servicios"
                 sesiones[telefono]["menu_serv"] = "categorias" # Establece el estado para la selección de categorías de servicios
                 return responder(
@@ -308,7 +314,7 @@ Mensaje: {mensaje}
                 )
 
             else:
-                return responder("❌ Opción no válida. Escribe 1, 2 o 3.\n📌 También puedes escribir *menú* para regresar al inicio.")
+                return responder("❌ Opción no válida. Por favor, escribe *1*, *2* o *3* para seleccionar un tipo de plan.\n📌 También puedes escribir *menú* para regresar al inicio.")
 
         # Si ya está en un submenú de planes (inmediato, futuro)
         elif sesiones[telefono]["submenu"] in ["inmediato", "futuro"]:
