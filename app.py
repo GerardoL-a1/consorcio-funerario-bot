@@ -45,8 +45,28 @@ Por favor indíquenos *en qué le gustaría recibir información o en qué podem
 claves_planes = ["plan", "planes", "servicio", "servicios", "paquete", "información", "informacion"]
 claves_emergencia = [
     "emergencia", "urgente", "fallecido", "murió", "murio", "accidente", "suceso",
-    "acaba de fallecer", "mi papá falleció", "mi mamá murió", "murió mi", "falleció mi",
-    "necesito ayuda con un funeral", "necesito apoyo", "ayúdenos", "urgente apoyo", "acaba de morir"
+    "acaba de fallecer", "acaba de morir", "se acaba de morir", "se acaba de ir",
+    "mi papá falleció", "mi mamá falleció", "murió mi papá", "murió mi mamá",
+    "mi papá murió", "mi mamá murió", "mi abuelo falleció", "mi abuela falleció",
+    "murió mi abuelo", "murió mi abuela", "falleció mi hermano", "murió mi hermano",
+    "falleció mi hermana", "murió mi hermana", "murió mi tío", "murió mi tía",
+    "falleció mi tío", "falleció mi tía", "murió mi primo", "murió mi prima",
+    "murió mi hijo", "murió mi hija", "falleció mi hijo", "falleció mi hija",
+    "se murió mi papá", "se murió mi mamá", "se murió mi abuelo", "se murió mi abuela",
+    "perdí a mi papá", "perdí a mi mamá", "perdí a mi abuelo", "perdí a mi abuela",
+    "mi esposo murió", "mi esposa murió", "falleció mi esposo", "falleció mi esposa",
+    "murió mi pareja", "mi pareja falleció", "mi novio falleció", "mi novia falleció",
+    "murió mi padrastro", "murió mi madrastra", "falleció mi padrastro", "falleció mi madrastra",
+    "murió mi suegro", "murió mi suegra", "falleció mi suegro", "falleció mi suegra",
+    "murió un familiar", "falleció un familiar", "se murió alguien", "perdí un ser querido",
+    "necesito ayuda con un funeral", "necesito apoyo", "ayúdenos", "urgente apoyo",
+    "urgente ayuda", "acaba de morir un familiar", "acaba de morir alguien",
+    "murió alguien cercano", "se nos fue", "acaba de fallecer alguien",
+    "tenemos un fallecido", "hay un fallecido", "necesito apoyo urgente", 
+    "necesitamos asistencia funeraria", "nos pasó una desgracia", "tuvimos una pérdida",
+    "sufrimos una pérdida", "necesito servicio funerario urgente",
+    "murió repentinamente", "falleció de repente", "urgente servicio funerario",
+    "ayuda por fallecimiento", "murió repentino", "perdí a alguien"
 ]
 claves_ubicacion = ["ubicación", "ubicaciones", "sucursal", "sucursales", "dirección", "direccion"]
 claves_cierre = ["gracias", "ok", "vale", "de acuerdo", "listo", "perfecto", "entendido", "muy bien"]
