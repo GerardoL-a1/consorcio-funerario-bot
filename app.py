@@ -52,24 +52,45 @@ claves_ubicacion = ["ubicación", "ubicaciones", "sucursal", "sucursales", "dire
 claves_cierre = ["gracias", "ok", "vale", "de acuerdo", "listo", "perfecto", "entendido", "muy bien"]
 
 # Diccionario de letras -> servicio (Aseguramos que las claves sean mayúsculas para una comparación consistente)
-# Se mantiene la lógica de que las claves en este diccionario son las que se usan para buscar en planes_info.py
-# La conversión a mayúsculas/minúsculas se maneja en la entrada del usuario.
 selecciones_letras = {
-    "A": "crédito de necesidad inmediata", "B": "servicio paquete fetal cremación",
-    "C": "servicio paquete sencillo sepultura", "D": "servicio paquete básico sepultura",
-    "E": "servicio cremación directa", "F": "servicio paquete de cremación",
-    "G": "servicio paquete legal", "H": "servicio de refrigeración y conservación",
-    "I": "red biker", "J": "red plus", "K": "red consorcio", "L": "red adulto mayor",
-    "M": "preventa de nichos a temporalidad", "N": "traslado", "O": "ataúd",
-    "P": "urna", "Q": "velación", "R": "boletas", "S": "carroza local",
-    "T": "carroza a panteón u horno crematorio", "U": "carroza legal",
-    "V": "camión local", "W": "embalsamado", "X": "embalsamado legal",
-    "Y": "embalsamado infecto-contagiosa", "Z": "trámites de inhumación",
-    "AA": "trámites de cremación", "AB": "trámites legales", "AC": "trámites de traslado",
-    "AD": "trámites de internación nacional", "AE": "trámites de internación internacional",
-    "AF": "equipo de velación", "AG": "cirios", "AH": "capilla de gobierno",
-    "AI": "capilla particular", "AJ": "traslado carretero por km",
-    "AK": "traslado de terracería por km", "AL": "camión foráneo por km",
+    **{k: "crédito de necesidad inmediata" for k in ["A", "a"]},
+    **{k: "servicio paquete fetal cremación" for k in ["B", "b"]},
+    **{k: "servicio paquete sencillo sepultura" for k in ["C", "c"]},
+    **{k: "servicio paquete básico sepultura" for k in ["D", "d"]},
+    **{k: "servicio cremación directa" for k in ["E", "e"]},
+    **{k: "servicio paquete de cremación" for k in ["F", "f"]},
+    **{k: "servicio paquete legal" for k in ["G", "g"]},
+    **{k: "servicio de refrigeración y conservación" for k in ["H", "h"]},
+    **{k: "red biker" for k in ["I", "i"]},
+    **{k: "red plus" for k in ["J", "j"]},
+    **{k: "red consorcio" for k in ["K", "k"]},
+    **{k: "red adulto mayor" for k in ["L", "l"]},
+    **{k: "preventa de nichos a temporalidad" for k in ["M", "m"]},
+    **{k: "traslado" for k in ["N", "n"]},
+    **{k: "ataúd" for k in ["O", "o"]},
+    **{k: "urna" for k in ["P", "p"]},
+    **{k: "velación" for k in ["Q", "q"]},
+    **{k: "boletas" for k in ["R", "r"]},
+    **{k: "carroza local" for k in ["S", "s"]},
+    **{k: "carroza a panteón u horno crematorio" for k in ["T", "t"]},
+    **{k: "carroza legal" for k in ["U", "u"]},
+    **{k: "camión local" for k in ["V", "v"]},
+    **{k: "embalsamado" for k in ["W", "w"]},
+    **{k: "embalsamado legal" for k in ["X", "x"]},
+    **{k: "embalsamado infecto-contagiosa" for k in ["Y", "y"]},
+    **{k: "trámites de inhumación" for k in ["Z", "z"]},
+    **{k: "trámites de cremación" for k in ["AA", "aa", "Aa", "aA"]},
+    **{k: "trámites legales" for k in ["AB", "ab", "Ab", "aB"]},
+    **{k: "trámites de traslado" for k in ["AC", "ac", "Ac", "aC"]},
+    **{k: "trámites de internación nacional" for k in ["AD", "ad", "Ad", "aD"]},
+    **{k: "trámites de internación internacional" for k in ["AE", "ae", "Ae", "aE"]},
+    **{k: "equipo de velación" for k in ["AF", "af", "Af", "aF"]},
+    **{k: "cirios" for k in ["AG", "ag", "Ag", "aG"]},
+    **{k: "capilla de gobierno" for k in ["AH", "ah", "Ah", "aH"]},
+    **{k: "capilla particular" for k in ["AI", "ai", "Ai", "aI"]},
+    **{k: "traslado carretero por km" for k in ["AJ", "aj", "Aj", "aJ"]},
+    **{k: "traslado de terracería por km" for k in ["AK", "ak", "Ak", "aK"]},
+    **{k: "camión foráneo por km" for k in ["AL", "al", "Al", "aL"]},
 }
 
 # --------------------------------------------- #
@@ -110,11 +131,10 @@ def contiene_flexible(lista_claves, mensaje_usuario, umbral=0.75):
     return False
 
 def es_mensaje_menu(mensaje):
-    # Añadimos 'menu' sin acento explícitamente para mayor robustez
     return (
         mensaje.strip().lower() in ["menú", "menu", "menù", "inicio", "menuh", "inicioo", "home"]
         or parecido("menú", mensaje)
-        or parecido("menu", mensaje) # Aseguramos que "menu" sin acento sea detectado
+        or parecido("menu", mensaje)
     )
 
 def es_mensaje_regresar(mensaje):
@@ -264,11 +284,8 @@ Mensaje: {mensaje}
     # FLUJO: PLANES
     # ----------------------------- #
     if sesiones[telefono].get("menu") == "planes":
-        # Normalizamos el mensaje para la comparación numérica
-        mensaje_normalizado = mensaje.strip()
-
         if "submenu" not in sesiones[telefono]: # Si aún no ha elegido un submenú de planes (1, 2 o 3)
-            if mensaje_normalizado == "1":
+            if mensaje == "1":
                 sesiones[telefono]["submenu"] = "inmediato"
                 return responder(
                     "⏱️ *Planes de necesidad inmediata:*\n"
@@ -285,7 +302,7 @@ Mensaje: {mensaje}
                     "📌 Escribe *menú* para regresar al inicio."
                 )
 
-            elif mensaje_normalizado == "2":
+            elif mensaje == "2":
                 sesiones[telefono]["submenu"] = "futuro"
                 return responder(
                     "🕰️ *Planes a futuro:*\n"
@@ -299,7 +316,7 @@ Mensaje: {mensaje}
                     "📌 Escribe *menú* para regresar al inicio."
                 )
 
-            elif mensaje_normalizado == "3":
+            elif mensaje == "3":
                 sesiones[telefono]["submenu"] = "servicios"
                 sesiones[telefono]["menu_serv"] = "categorias" # Establece el estado para la selección de categorías de servicios
                 return responder(
@@ -314,7 +331,7 @@ Mensaje: {mensaje}
                 )
 
             else:
-                return responder("❌ Opción no válida. Por favor, escribe *1*, *2* o *3* para seleccionar un tipo de plan.\n📌 También puedes escribir *menú* para regresar al inicio.")
+                return responder("❌ Opción no válida. Escribe 1, 2 o 3.\n📌 También puedes escribir *menú* para regresar al inicio.")
 
         # Si ya está en un submenú de planes (inmediato, futuro)
         elif sesiones[telefono]["submenu"] in ["inmediato", "futuro"]:
@@ -427,3 +444,4 @@ Mensaje: {mensaje}
 # ----------------------------- #
 if __name__ == "__main__":
     app.run(debug=True)
+    
