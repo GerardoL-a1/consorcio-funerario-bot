@@ -274,7 +274,7 @@ def mensaje_inactividad(numero):
     if numero in sesiones:
         requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
             "To": numero,
-            "From": "whatsapp:+14155238886",
+            "From": "whatsapp:+525510704725",
             "Body": MESSAGES["inactivity_warning"]
         })
         temporizadores.pop(numero, None)
@@ -407,12 +407,12 @@ Mensaje: {mensaje}
 """
             requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
                 "To": NUMERO_REENVIO_PRINCIPAL,
-                "From": "whatsapp:+14155238886",
+                "From": "whatsapp:+525510704725",
                 "Body": alerta
             })
             requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
                 "To": NUMERO_REENVIO_SECUNDARIO,
-                "From": "whatsapp:+14155238886",
+                "From": "whatsapp:+525510704725",
                 "Body": alerta
             })
 
@@ -501,7 +501,7 @@ Mensaje: {mensaje}
             datos = f"📆 *CITA SOLICITADA*\nCliente: {telefono}\nDatos: {mensaje}"
             requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
                 "To": NUMERO_REENVIO_PRINCIPAL,
-                "From": "whatsapp:+14155238886",
+                "From": "whatsapp:+525510704725",
                 "Body": datos
             })
             sesiones[telefono] = {} # Reinicia la sesión después de registrar la cita
@@ -523,3 +523,4 @@ Mensaje: {mensaje}
 # ----------------------------- #
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    
