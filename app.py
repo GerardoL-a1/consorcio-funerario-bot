@@ -74,7 +74,7 @@ Por favor responde con los siguientes datos:
         "2. Planes a futuro\n"
         "3. Servicios individuales\n\n"
         "📝 Escribe el número de la opción deseada.\n"
-        "📌 Escribe la palabra *menú* para regresar al inicio." # Aquí ya está la opción de regresar al inicio
+        "📌 Escribe la palabra *menú* para regresar al inicio."
     ),
 
     "plans_inmediato_menu": (
@@ -88,7 +88,7 @@ Por favor responde con los siguientes datos:
         "G. Servicio paquete legal\n"
         "H. Servicio de refrigeración y conservación\n\n"
         "📝 Escribe la letra correspondiente para más información.\n"
-        "🔙 Escribe *regresar* para volver al menú de planes.\n" # MODIFICADO
+        "🔙 Escribe *regresar* para volver al menú de planes.\n"
         "📌 Escribe *menú* para regresar al inicio."
     ),
 
@@ -98,20 +98,23 @@ Por favor responde con los siguientes datos:
         "J. Red Plus\n"
         "K. Red Consorcio\n"
         "L. Red Adulto Mayor\n"
-        "M. Preventa de Nichos a Temporalidad\n\n"
+        "M. Preventa de Nichos a Temporalidad\n"
+        "N. Cremación Amigo Fiel\n" # Añadido
+        "O. Cremación de Restos Áridos\n\n" # Añadido
         "📝 Escribe la letra correspondiente para más información.\n"
-        "🔙 Escribe *regresar* para volver al menú de planes.\n" # MODIFICADO
+        "🔙 Escribe *regresar* para volver al menú de planes.\n"
         "📌 Escribe *menú* para regresar al inicio."
     ),
 
-    "plans_individual_categories": (
+    # CORRECCIÓN: Renombrado de 'plans_individual_categories' a 'individual_categories'
+    "individual_categories": (
         "☝🏻️ *Servicios Individuales* – Elige una categoría:\n\n"
         "A. Trámites y Papelería\n"
         "B. Traslados y Carrozas\n"
         "C. Objetos y Equipamiento\n"
         "D. Procedimientos Especiales\n\n"
         "📝 Escribe la letra correspondiente.\n"
-        "🔙 Escribe *regresar* para volver al menú de planes.\n" # MODIFICADO
+        "🔙 Escribe *regresar* para volver al menú de planes.\n"
         "📌 Escribe *menú* para regresar al inicio."
     ),
 
@@ -124,47 +127,47 @@ Por favor responde con los siguientes datos:
         "AD. Trámites de internación nacional\n"
         "AE. Trámites de internación internacional\n\n"
         "📝 Escribe la letra deseada.\n"
-        "🔙 Escribe *regresar* para volver a las categorías de servicios individuales.\n" # MODIFICADO
+        "🔙 Escribe *regresar* para volver a las categorías de servicios individuales.\n"
         "📌 Escribe *menú* para volver al inicio."
     ),
 
     "individual_traslados_menu": (
         "🚚 *Traslados y Carrozas:*\n"
-        "N. Traslado\n"
-        "S. Carroza local\n"
-        "T. Carroza a panteón u horno crematorio\n"
-        "U. Carroza legal\n"
-        "V. Camión local\n"
+        "P. Traslado\n" # Letra cambiada para evitar conflicto con planes_futuro_menu
+        "Q. Carroza local\n" # Letra cambiada
+        "R. Carroza a panteón u horno crematorio\n" # Letra cambiada
+        "S. Carroza legal\n" # Letra cambiada
+        "T. Camión local\n" # Letra cambiada
         "AJ. Traslado carretero por km\n"
         "AK. Traslado de terracería por km\n"
         "AL. Camión foráneo por km\n\n"
         "📝 Escribe la letra deseada.\n"
-        "🔙 Escribe *regresar* para volver a las categorías de servicios individuales.\n" # MODIFICADO
+        "🔙 Escribe *regresar* para volver a las categorías de servicios individuales.\n"
         "📌 Escribe *menú* para volver al inicio."
     ),
 
     "individual_equipamiento_menu": (
         "🛄 *Objetos y Equipamiento:*\n"
-        "O. Ataúd\n"
-        "P. Urna\n"
+        "U. Ataúd\n" # Letra cambiada
+        "V. Urna\n" # Letra cambiada
         "AF. Equipo de velación\n"
         "AG. Cirios\n"
         "AH. Capilla de gobierno\n"
         "AI. Capilla particular\n\n"
         "📝 Escribe la letra deseada.\n"
-        "🔙 Escribe *regresar* para volver a las categorías de servicios individuales.\n" # MODIFICADO
+        "🔙 Escribe *regresar* para volver a las categorías de servicios individuales.\n"
         "📌 Escribe *menú* para volver al inicio."
     ),
 
     "individual_procedimientos_menu": (
         "🧪 *Procedimientos Especiales:*\n"
-        "Q. Velación\n"
-        "R. Boletas\n"
-        "W. Embalsamado\n"
-        "X. Embalsamado legal\n"
-        "Y. Embalsamado infecto-contagiosa\n\n"
+        "W. Velación\n" # Letra cambiada
+        "X. Boletas\n" # Letra cambiada
+        "Y. Embalsamado\n" # Letra cambiada
+        "Z. Embalsamado legal\n" # Letra cambiada
+        "AA. Embalsamado infecto-contagiosa\n\n" # Letra cambiada
         "📝 Escribe la letra deseada.\n"
-        "🔙 Escribe *regresar* para volver a las categorías de servicios individuales.\n" # MODIFICADO
+        "🔙 Escribe *regresar* para volver a las categorías de servicios individuales.\n"
         "📌 Escribe *menú* para volver al inicio."
     ),
 
@@ -186,7 +189,7 @@ claves_emergencia = [
     "acaba de fallecer", "acaba de morir", "necesito ayuda con un funeral", "necesito apoyo",
     "ayúdenos", "urgente apoyo", "urgente funeral", "funeral urgente", "ayuda urgente",
     "se murió", "se nos fue", "ya no está", "ya falleció", "ya murió",
-    
+
     # Familiares directos
     "murió mi papá", "falleció mi papá", "mi papá murió", "mi papá falleció",
     "murió mi mamá", "falleció mi mamá", "mi mamá murió", "mi mamá falleció",
@@ -212,22 +215,53 @@ claves_ubicacion = ["ubicación", "ubicaciones", "sucursal", "sucursales", "dire
 claves_cierre = ["gracias", "ok", "vale", "de acuerdo", "listo", "perfecto", "entendido", "muy bien"]
 
 # Diccionario de letras -> servicio (ahora solo en minúsculas, la entrada del usuario se convertirá)
+# CORRECCIÓN: Reorganización y adición de nuevas letras para evitar conflictos y añadir nuevos servicios
 selecciones_letras = {
     "a": "crédito de necesidad inmediata", "b": "servicio paquete fetal cremación",
     "c": "servicio paquete sencillo sepultura", "d": "servicio paquete básico sepultura",
     "e": "servicio cremación directa", "f": "servicio paquete de cremación",
     "g": "servicio paquete legal", "h": "servicio de refrigeración y conservación",
     "i": "red biker", "j": "red plus", "k": "red consorcio", "l": "red adulto mayor",
-    "m": "preventa de nichos a temporalidad", "n": "traslado", "o": "ataúd",
-    "p": "urna", "q": "velación", "r": "boletas", "s": "carroza local",
-    "t": "carroza a panteón u horno crematorio", "u": "carroza legal",
-    "v": "camión local", "w": "embalsamado", "x": "embalsamado legal",
-    "y": "embalsamado infecto-contagiosa", "z": "trámites de inhumación",
-    "aa": "trámites de cremación", "ab": "trámites legales", "ac": "trámites de traslado",
-    "ad": "trámites de internación nacional", "ae": "trámites de internación internacional",
-    "af": "equipo de velación", "ag": "cirios", "ah": "capilla de gobierno",
-    "ai": "capilla particular", "aj": "traslado carretero por km",
-    "ak": "traslado de terracería por km", "al": "camión foráneo por km",
+    "m": "preventa de nichos a temporalidad",
+    "n": "cremación amigo fiel", # Añadido
+    "o": "servicio paquete de cremación de restos áridos", # Añadido
+
+    # Servicios Individuales - Traslados y Carrozas (P-T)
+    "p": "traslado",
+    "q": "carroza local",
+    "r": "carroza a panteón u horno crematorio",
+    "s": "carroza legal",
+    "t": "camión local",
+
+    # Servicios Individuales - Objetos y Equipamiento (U-V)
+    "u": "ataúd",
+    "v": "urna",
+
+    # Servicios Individuales - Procedimientos Especiales (W-Y)
+    "w": "velación",
+    "x": "boletas",
+    "y": "embalsamado",
+    "z": "embalsamado legal", # Letra cambiada
+    "aa": "embalsamado infecto-contagiosa", # Letra cambiada
+
+    # Servicios Individuales - Trámites y Papelería (AB-AE)
+    "ab": "trámites de inhumación", # Letra cambiada
+    "ac": "trámites de cremación", # Letra cambiada
+    "ad": "trámites legales", # Letra cambiada
+    "ae": "trámites de traslado", # Letra cambiada
+    "af": "trámites de internación nacional", # Letra cambiada
+    "ag": "trámites de internación internacional", # Letra cambiada
+
+    # Servicios Individuales - Equipo de Velación y Capillas (AH-AK)
+    "ah": "equipo de velación", # Letra cambiada
+    "ai": "cirios", # Letra cambiada
+    "aj": "capilla de gobierno", # Letra cambiada
+    "ak": "capilla particular", # Letra cambiada
+
+    # Traslados por Kilómetro (AL-AN)
+    "al": "traslado carretero por km", # Letra cambiada
+    "am": "traslado de terracería por km", # Letra cambiada
+    "an": "camión foráneo por km", # Letra cambiada
 }
 
 # --- Funciones Auxiliares ---
@@ -250,11 +284,17 @@ def mensaje_inactividad(numero):
 def parecido(palabra_objetivo, mensaje, umbral=0.75):
     """Detecta si una palabra es suficientemente parecida al mensaje recibido."""
     return SequenceMatcher(None, palabra_objetivo.lower(), mensaje.lower()).ratio() >= umbral
-    
+
 def contiene_flexible(lista_claves, mensaje_usuario, umbral=0.75):
     """Devuelve True si el mensaje es similar a alguna palabra clave."""
     mensaje_usuario = mensaje_usuario.strip().lower()
     for palabra_clave in lista_claves:
+        # CORRECCIÓN: Mejorar la detección flexible para frases
+        # Si la palabra clave es una frase, buscarla directamente
+        if " " in palabra_clave:
+            if palabra_clave in mensaje_usuario:
+                return True
+        # Si es una palabra simple o para comparación de similitud
         if parecido(palabra_clave, mensaje_usuario, umbral):
             return True
     return False
@@ -311,7 +351,7 @@ def webhook():
                 if current_menu_serv and current_menu_serv != "categorias":
                     # Si está en un sub-submenú de servicios individuales (trámites, traslados, etc.)
                     sesiones[telefono]["menu_serv"] = "categorias"
-                    return responder(MESSAGES["individual_categories"])
+                    return responder(MESSAGES["individual_categories"]) # CORRECCIÓN: Usar la clave correcta
                 elif current_submenu:
                     # Si está en un submenú de planes (inmediato, futuro, servicios)
                     del sesiones[telefono]["submenu"]
@@ -336,7 +376,7 @@ def webhook():
         if contiene_flexible(claves_cierre, mensaje):
             sesiones[telefono] = {} # Reinicia la sesión después de una confirmación de cierre
             return responder(MESSAGES["thanks_confirmation"])
-        
+
         # ----------------------------- #
         # FLUJO: BIENVENIDA Y DETECCIÓN INICIAL
         # ----------------------------- #
@@ -391,7 +431,7 @@ Mensaje: {mensaje}
                 return responder(MESSAGES["thanks_confirmation"])
             else:
                 return responder(MESSAGES["location_ask_appointment"])
-        
+
         # ----------------------------- #
         # FLUJO: PLANES
         # ----------------------------- #
@@ -408,7 +448,7 @@ Mensaje: {mensaje}
                 elif mensaje == "3":
                     sesiones[telefono]["submenu"] = "servicios"
                     sesiones[telefono]["menu_serv"] = "categorias" # Establece el estado para la selección de categorías de servicios
-                    return responder(MESSAGES["plans_individual_categories"])
+                    return responder(MESSAGES["individual_categories"]) # CORRECCIÓN: Usar la clave correcta
 
                 else:
                     return responder(MESSAGES["invalid_option"])
@@ -453,7 +493,7 @@ Mensaje: {mensaje}
                         return responder(respuesta + "\n\n📌 Si necesitas algo más, escribe la palabra *menú* para regresar al inicio.")
                     else:
                         return responder(MESSAGES["letter_not_recognized"])
-        
+
         # ----------------------------- #
         # FLUJO: CITA DESDE UBICACIÓN
         # ----------------------------- #
@@ -483,4 +523,3 @@ Mensaje: {mensaje}
 # ----------------------------- #
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
-
