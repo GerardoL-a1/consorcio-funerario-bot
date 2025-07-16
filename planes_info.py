@@ -407,10 +407,9 @@ def responder_plan(mensaje_clave): # Cambiado el nombre del parámetro para mayo
     """
     # No es necesario convertir a minúsculas aquí si ya se hace en app.py antes de llamar.
     # Pero lo mantengo por robustez si se llama desde otro lugar.
-    mensaje_clave = mensaje_clave.lower() 
-    
+    mensaje_clave = mensaje_clave.lower()
+
     if mensaje_clave in planes_info: # Usar 'in' para verificar existencia de la clave
         return planes_info[mensaje_clave]
-    
-    return "🤖 No entendí tu mensaje. Escribe el nombre o número de un plan correctamente. Si persiste el error, puede estar en mantenimiento temporal."
 
+    return "🤖 No entendí tu mensaje. Escribe el nombre o número de un plan correctamente. Si persiste el error, puede estar en mantenimiento temporal."
