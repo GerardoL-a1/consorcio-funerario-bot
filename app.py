@@ -74,7 +74,7 @@ Por favor responde con los siguientes datos:
         "2. Planes a futuro\n"
         "3. Servicios individuales\n\n"
         "📝 Escribe el número de la opción deseada.\n"
-        "📌 Escribe la palabra *menú* para regresar al inicio."
+        "📌 Escribe la palabra *menú* para regresar al inicio." # Aquí ya está la opción de regresar al inicio
     ),
 
     "plans_inmediato_menu": (
@@ -88,7 +88,7 @@ Por favor responde con los siguientes datos:
         "G. Servicio paquete legal\n"
         "H. Servicio de refrigeración y conservación\n\n"
         "📝 Escribe la letra correspondiente para más información.\n"
-        "🔙 Escribe *regresar* para volver.\n"
+        "🔙 Escribe *regresar* para volver al menú de planes.\n" # MODIFICADO
         "📌 Escribe *menú* para regresar al inicio."
     ),
 
@@ -100,7 +100,7 @@ Por favor responde con los siguientes datos:
         "L. Red Adulto Mayor\n"
         "M. Preventa de Nichos a Temporalidad\n\n"
         "📝 Escribe la letra correspondiente para más información.\n"
-        "🔙 Escribe *regresar* para volver.\n"
+        "🔙 Escribe *regresar* para volver al menú de planes.\n" # MODIFICADO
         "📌 Escribe *menú* para regresar al inicio."
     ),
 
@@ -111,7 +111,7 @@ Por favor responde con los siguientes datos:
         "C. Objetos y Equipamiento\n"
         "D. Procedimientos Especiales\n\n"
         "📝 Escribe la letra correspondiente.\n"
-        "🔙 Escribe *regresar* para volver.\n"
+        "🔙 Escribe *regresar* para volver al menú de planes.\n" # MODIFICADO
         "📌 Escribe *menú* para regresar al inicio."
     ),
 
@@ -124,7 +124,7 @@ Por favor responde con los siguientes datos:
         "AD. Trámites de internación nacional\n"
         "AE. Trámites de internación internacional\n\n"
         "📝 Escribe la letra deseada.\n"
-        "🔙 Escribe *regresar* para volver a categorías.\n"
+        "🔙 Escribe *regresar* para volver a las categorías de servicios individuales.\n" # MODIFICADO
         "📌 Escribe *menú* para volver al inicio."
     ),
 
@@ -139,7 +139,7 @@ Por favor responde con los siguientes datos:
         "AK. Traslado de terracería por km\n"
         "AL. Camión foráneo por km\n\n"
         "📝 Escribe la letra deseada.\n"
-        "🔙 Escribe *regresar* para volver a categorías.\n"
+        "🔙 Escribe *regresar* para volver a las categorías de servicios individuales.\n" # MODIFICADO
         "📌 Escribe *menú* para volver al inicio."
     ),
 
@@ -152,7 +152,7 @@ Por favor responde con los siguientes datos:
         "AH. Capilla de gobierno\n"
         "AI. Capilla particular\n\n"
         "📝 Escribe la letra deseada.\n"
-        "🔙 Escribe *regresar* para volver a categorías.\n"
+        "🔙 Escribe *regresar* para volver a las categorías de servicios individuales.\n" # MODIFICADO
         "📌 Escribe *menú* para volver al inicio."
     ),
 
@@ -164,7 +164,7 @@ Por favor responde con los siguientes datos:
         "X. Embalsamado legal\n"
         "Y. Embalsamado infecto-contagiosa\n\n"
         "📝 Escribe la letra deseada.\n"
-        "🔙 Escribe *regresar* para volver a categorías.\n"
+        "🔙 Escribe *regresar* para volver a las categorías de servicios individuales.\n" # MODIFICADO
         "📌 Escribe *menú* para volver al inicio."
     ),
 
