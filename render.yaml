@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: consorcio-funerario-bot
+    env: python
+    buildCommand: ""
+    startCommand: gunicorn app:app
+    envVars:
+      - key: TWILIO_ACCOUNT_SID
+        value: your_twilio_sid # ¡REEMPLAZA CON TU TWILIO ACCOUNT SID REAL!
+      - key: TWILIO_AUTH_TOKEN
+        value: your_twilio_auth_token # ¡REEMPLAZA CON TU TWILIO AUTH TOKEN REAL!
+      - key: NUMERO_REENVIO_PRINCIPAL
+        value: "+525523604519" # ¡REEMPLAZA CON EL NÚMERO REAL DE REENVÍO PRINCIPAL!
+      - key: NUMERO_REENVIO_SECUNDARIO
+        value: "+525523680734" # ¡REEMPLAZA CON EL NÚMERO REAL DE REENVÍO SECUNDARIO!
