@@ -15,8 +15,9 @@ planes_info = {
         "- Costo + IVA\n\n"
         "🛡️ Garantías:\n"
         "🔸 Empresa 100% mexicana con +28 años\n"
-        "🔸 Contrato autorizado por PROFECO\n"
-        "🔸 Servicio 24/7 en todo México"
+        "📜 Contrato autorizado por PROFECO.\n"
+        "🔸 Servicio 24/7 en todo México\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "servicio paquete fetal cremación": (
@@ -33,8 +34,9 @@ planes_info = {
         "5️⃣ Urna básica para entrega\n\n"
         "🛡️ Garantías:\n"
         "🔸 Empresa 100% mexicana con +28 años\n"
-        "🔸 Contrato autorizado por PROFECO\n"
-        "🔸 Servicio 24/7 en todo México"
+        "📜 Contrato autorizado por PROFECO.\n"
+        "🔸 Servicio 24/7 en todo México\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "servicio paquete sencillo sepultura": (
@@ -49,8 +51,9 @@ planes_info = {
         "6️⃣ Carroza al panteón\n\n"
         "🛡️ Garantías:\n"
         "🔸 Empresa 100% mexicana con +28 años\n"
-        "🔸 Contrato autorizado por PROFECO\n"
-        "🔸 Servicio 24/7 en todo México"
+        "📜 Contrato autorizado por PROFECO.\n"
+        "🔸 Servicio 24/7 en todo México\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "servicio paquete básico sepultura": (
@@ -60,8 +63,9 @@ planes_info = {
         "Incluye lo mismo que el paquete sencillo pero con ataúd metálico, embalsamado, asesoría legal y elementos adicionales de velación.\n\n"
         "🛡️ Garantías:\n"
         "🔸 Empresa 100% mexicana con +28 años\n"
-        "🔸 Contrato autorizado por PROFECO\n"
-        "🔸 Servicio 24/7 en todo México"
+        "📜 Contrato autorizado por PROFECO.\n"
+        "🔸 Servicio 24/7 en todo México\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "servicio cremación directa": (
@@ -77,8 +81,9 @@ planes_info = {
         "7️⃣ Urna básica\n\n"
         "🛡️ Garantías:\n"
         "🔸 Empresa con +28 años\n"
-        "🔸 Contrato autorizado por PROFECO\n"
-        "🔸 Servicio 24/7 nacional"
+        "📜 Contrato autorizado por PROFECO.\n"
+        "🔸 Servicio 24/7 en México\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "servicio paquete de cremación": (
@@ -95,8 +100,9 @@ planes_info = {
         "8️⃣ Placa grabada\n\n"
         "🛡️ Garantías:\n"
         "🔸 Empresa con +28 años\n"
-        "🔸 Contrato autorizado por PROFECO\n"
-        "🔸 Servicio 24/7 nacional"
+        "📜 Contrato autorizado por PROFECO.\n"
+        "🔸 Servicio 24/7 en México\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "servicio paquete legal": (
@@ -107,7 +113,8 @@ planes_info = {
         "🛡️ Garantías:\n"
         "🔸 Contrato autorizado por PROFECO\n"
         "🔸 28 años de experiencia\n"
-        "🔸 Cobertura total 24/7"
+        "🔸 Cobertura en México 24/7\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "servicio de refrigeración y conservación": (
@@ -118,8 +125,9 @@ planes_info = {
         "3️⃣ Instalaciones autorizadas por Secretaría de Salud\n\n"
         "🛡️ Garantías:\n"
         "🔸 Empresa 100% mexicana\n"
-        "🔸 Contrato autorizado por PROFECO\n"
-        "🔸 Servicio 24/7 local"
+        "📜 Contrato autorizado por PROFECO.\n"
+        "🔸 Servicio 24/7 local\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "red biker": (
@@ -133,7 +141,8 @@ planes_info = {
         "- Uso: $2,990 al momento del fallecimiento + IVA\n\n"
         "🛡️ Garantías:\n"
         "🔸 Contrato PROFECO\n"
-        "🔸 Servicio nacional 24/7"
+        "🔸 Servicio en México 24/7\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "red plus": (
@@ -147,7 +156,8 @@ planes_info = {
         "- Uso: $2,990 al fallecimiento + IVA\n\n"
         "🛡️ Garantías:\n"
         "🔸 Contrato PROFECO\n"
-        "🔸 Más de 28 años de experiencia"
+        "🔸 Más de 28 años de experiencia\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "red consorcio": (
@@ -161,7 +171,8 @@ planes_info = {
         "- Uso: $2,990 al fallecimiento + IVA\n\n"
         "🛡️ Garantías:\n"
         "🔸 Contrato PROFECO\n"
-        "🔸 Atención nacional 24/7"
+        "🔸 Atención en México 24/7\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "red adulto mayor": (
@@ -174,7 +185,8 @@ planes_info = {
         "- Uso: $2,990 al fallecimiento + IVA\n\n"
         "🛡️ Garantías:\n"
         "🔸 Contrato PROFECO\n"
-        "🔸 Cobertura nacional e internacional"
+        "🔸 Cobertura en México\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "cremación amigo fiel": (
@@ -185,7 +197,8 @@ planes_info = {
         "🛡️ Garantías:\n"
         "🔸 Empresa con +28 años\n"
         "🔸 Atención humana\n"
-        "🔸 Respeto por la familia animal"
+        "🔸 Respeto por la familia animal\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "servicio paquete de cremación de restos áridos": (
@@ -198,9 +211,10 @@ planes_info = {
         "4️⃣ Servicio de cremación\n"
         "5️⃣ Urna básica para entrega\n\n"
         "🛡️ Garantías:\n"
-        "🔸 Servicio nacional\n"
-        "🔸 Contrato PROFECO\n"
-        "🔸 Empresa con +28 años"
+        "🔸 Servicio en todo México\n"
+        "📜 Contrato autorizado por PROFECO.\n"
+        "🔸 Empresa con +28 años\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "preventa de nichos a temporalidad": (
@@ -210,7 +224,8 @@ planes_info = {
         "🛡️ Garantías:\n"
         "🔸 Contrato PROFECO\n"
         "🔸 Empresa con 28 años\n"
-        "🔸 Trato justo y profesional"
+        "🔸 Trato justo y profesional\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "traslado": (
@@ -219,8 +234,9 @@ planes_info = {
         "Contamos con unidades equipadas, permisos en regla y cobertura inmediata.\n\n"
         "🛡️ Garantías:\n"
         "🔸 Empresa 100% mexicana con +28 años de experiencia\n"
-        "🔸 Contrato autorizado por PROFECO\n"
-        "🔸 Servicio 24/7 en todo México y el extranjero"
+        "📜 Contrato autorizado por PROFECO.\n"
+        "🔸 Servicio 24/7 en todo México y el extranjero\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "ataúd": (
@@ -230,7 +246,8 @@ planes_info = {
         "🛡️ Garantías:\n"
         "🔸 Calidad y materiales certificados\n"
         "🔸 Empresa 100% mexicana con +28 años\n"
-        "🔸 Atención profesional y honesta"
+        "🔸 Atención profesional y honesta\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "urna": (
@@ -240,7 +257,8 @@ planes_info = {
         "🛡️ Garantías:\n"
         "🔸 Amplia variedad en stock\n"
         "🔸 Empresa con más de 28 años\n"
-        "🔸 Atención cálida y personalizada"
+        "🔸 Atención cálida y personalizada\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "velación": (
@@ -251,7 +269,8 @@ planes_info = {
         "🛡️ Garantías:\n"
         "🔸 Servicios certificados\n"
         "🔸 Más de 28 años de experiencia\n"
-        "🔸 Asistencia humana y respetuosa"
+        "🔸 Asistencia humana y respetuosa\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "boletas": (
@@ -261,7 +280,8 @@ planes_info = {
         "🛡️ Garantías:\n"
         "🔸 Trámite legal y certificado\n"
         "🔸 Acompañamiento profesional\n"
-        "🔸 +28 años al servicio de las familias"
+        "🔸 +28 años al servicio de las familias\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "carroza local": (
@@ -271,7 +291,8 @@ planes_info = {
         "💰 Costo: Desde $1,500.00 + IVA\n\n"
         "🛡️ Garantías:\n"
         "🔸 Conductores capacitados\n"
-        "🔸 Vehículos higienizados y equipados"
+        "🔸 Vehículos higienizados y equipados\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "carroza a panteón u horno crematorio": (
@@ -280,7 +301,8 @@ planes_info = {
         "💰 Costo: Desde $2,200.00 + IVA\n\n"
         "🛡️ Garantías:\n"
         "🔸 Unidades discretas y climatizadas\n"
-        "🔸 Respeto en el último trayecto"
+        "🔸 Respeto en el último trayecto\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "carroza legal": (
@@ -290,126 +312,142 @@ planes_info = {
         "💰 Costo: Desde $3,500.00 + IVA\n\n"
         "🛡️ Garantías:\n"
         "🔸 Documentación en regla\n"
-        "🔸 Coordinación con autoridades"
+        "🔸 Coordinación con autoridades\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "camión local": (
         "🚛 *Camión Local*\n\n"
         "Camiones habilitados para traslados de ataúdes o restos en zonas urbanas o rurales.\n"
         "Capacidad para múltiples servicios.\n\n"
-        "💰 Costo: Desde $1,800.00 + IVA"
+        "💰 Costo: Desde $1,800.00 + IVA\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "embalsamado": (
         "💉 *Embalsamado Básico*\n\n"
         "Tratamiento químico para preservar el cuerpo por tiempo corto o velaciones simples.\n\n"
-        "💰 Costo: $1,200.00 + IVA"
+        "💰 Costo: $1,200.00 + IVA\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "embalsamado legal": (
         "⚖️ *Embalsamado Legal*\n\n"
         "Proceso requerido por autoridades cuando el cuerpo va a ser trasladado fuera del estado o del país.\n\n"
-        "💰 Costo: $2,800.00 + IVA"
+        "💰 Costo: $2,800.00 + IVA\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "embalsamado infecto-contagiosa": (
         "☣️ *Embalsamado Infecto-Contagioso*\n\n"
         "Tratamiento especial con químicos certificados para casos de fallecimiento por enfermedades contagiosas.\n\n"
-        "💰 Costo: $3,800.00 + IVA"
+        "💰 Costo: $3,800.00 + IVA\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "trámites de inhumación": (
         "📜 *Trámite de Inhumación*\n\n"
         "Gestión ante Registro Civil y panteones para entierro legal.\n"
         "Incluye papeleo, coordinación y permisos.\n\n"
-        "💰 Costo: $1,000.00 + IVA"
+        "💰 Costo: $1,000.00 + IVA\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "trámites de cremación": (
         "📜 *Trámite de Cremación*\n\n"
         "Gestión legal ante Registro Civil y crematorios para autorizar cremación.\n"
         "Incluye boleta y requisitos de ley.\n\n"
-        "💰 Costo: $1,000.00 + IVA"
+        "💰 Costo: $1,000.00 + IVA\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "trámites legales": (
         "⚖️ *Trámites Legales Funerarios*\n\n"
         "Asesoría y gestión en caso de fallecimiento por dictamen médico legal.\n"
         "Incluye Ministerio Público y SEMEFO.\n\n"
-        "💰 Costo: $3,000.00 + IVA"
+        "💰 Costo: $3,000.00 + IVA\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "trámites de traslado": (
         "🚚 *Trámite de Traslado de Cuerpo*\n\n"
         "Permisos y logística para movilizar un cuerpo fuera del municipio o estado.\n\n"
-        "💰 Costo: $2,000.00 + IVA"
+        "💰 Costo: $2,000.00 + IVA\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "trámites de internación nacional": (
         "🛃 *Internación Nacional*\n\n"
         "Trámite ante autoridades federales para entrada de restos desde otros estados del país.\n\n"
-        "💰 Costo: $3,000.00 + IVA"
+        "💰 Costo: $3,000.00 + IVA\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "trámites de internación internacional": (
         "✈️ *Internación Internacional*\n\n"
         "Gestión legal para recibir restos desde el extranjero, con consulados y aduanas.\n\n"
-        "💰 Costo: $8,000.00 + IVA"
+        "💰 Costo: $8,000.00 + IVA\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "equipo de velación": (
         "🕯️ *Equipo de Velación*\n\n"
         "Incluye cristo, pedestal, 4 candeleros, mesa, mantel y velas decorativas.\n\n"
-        "💰 Costo: $1,500.00 + IVA"
+        "💰 Costo: $1,500.00 + IVA\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "cirios": (
         "🕯️ *Juego de Cirios Grandes*\n\n"
         "Velas de ceremonia para velación y novenario. Se pueden personalizar.\n\n"
-        "💰 Costo: $400.00"
+        "💰 Costo: $400.00\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "capilla de gobierno": (
         "⛪ *Capilla Autorizada por Gobierno*\n\n"
         "Velación en instalaciones con permiso de COFEPRIS y gobierno local.\n\n"
-        "💰 Costo: $2,000.00 + IVA por noche"
+        "💰 Costo: $2,000.00 + IVA por noche\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "capilla particular": (
         "🏠 *Capilla Particular*\n\n"
         "Salones privados para velación, equipados con área de descanso y cafetería.\n\n"
-        "💰 Costo: $3,500.00 + IVA por noche"
+        "💰 Costo: $3,500.00 + IVA por noche\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "traslado carretero por km": (
         "🛣️ *Traslado Carretero por Kilómetro*\n\n"
         "Servicio de traslado terrestre en carretera con unidad especial.\n\n"
-        "💰 Costo: Desde $35.00 por km"
+        "💰 Costo: Desde $35.00 por km\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "traslado de terracería por km": (
         "🌄 *Traslado por Terracería por Kilómetro*\n\n"
         "Para comunidades rurales sin pavimento. Unidad adaptada para accesos difíciles.\n\n"
-        "💰 Costo: Desde $45.00 por km"
+        "💰 Costo: Desde $45.00 por km\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     ),
 
     "camión foráneo por km": (
         "🚛 *Camión Foráneo por Kilómetro*\n\n"
         "Traslado interestatal o foráneo para restos humanos en camión certificado.\n\n"
-        "💰 Costo: Desde $50.00 por km"
+        "💰 Costo: Desde $50.00 por km\n"
+        "📞 *Para más información o contratación directa, solicite hablar con nuestro asesor funerario.*"
     )
 }
 
-def responder_plan(mensaje_clave): # Cambiado el nombre del parámetro para mayor claridad
+def responder_plan(mensaje_clave):
     """
     Busca y devuelve la información de un plan o servicio específico.
     Se espera que mensaje_clave sea la clave exacta del diccionario planes_info.
     """
-    # No es necesario convertir a minúsculas aquí si ya se hace en app.py antes de llamar.
-    # Pero lo mantengo por robustez si se llama desde otro lugar.
     mensaje_clave = mensaje_clave.lower()
 
-    if mensaje_clave in planes_info: # Usar 'in' para verificar existencia de la clave
+    if mensaje_clave in planes_info:
         return planes_info[mensaje_clave]
 
     return "🤖 No entendí tu mensaje. Escribe el nombre o número de un plan correctamente. Si persiste el error, puede estar en mantenimiento temporal."
