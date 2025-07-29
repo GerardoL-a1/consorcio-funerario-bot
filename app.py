@@ -107,8 +107,8 @@ MESSAGES = {
         "K. Red Consorcio\n"
         "L. Red Adulto Mayor\n"
         "M. Preventa de Nichos a Temporalidad\n"
-        "N. Cremación Amigo Fiel\n" # Añadido
-        "O. Cremación de Restos Áridos\n\n" # Añadido
+        "N. Cremación Amigo Fiel\n"
+        "O. Cremación de Restos Áridos\n\n"
         "📝 Escribe la letra correspondiente para más información.\n"
         "🔙 Escribe *regresar* para volver al menú de planes.\n"
         "📌 Escribe *menú* para regresar al inicio."
@@ -127,12 +127,12 @@ MESSAGES = {
 
     "individual_tramites_menu": (
         "📜 *Trámites y Papelería:*\n"
-        "Z. Trámites de inhumación\n"
-        "AA. Trámites de cremación\n"
-        "AB. Trámites legales\n"
-        "AC. Trámites de traslado\n"
-        "AD. Trámites de internación nacional\n"
-        "AE. Trámites de internación internacional\n\n"
+        "AB. Trámites de inhumación\n"
+        "AC. Trámites de cremación\n"
+        "AD. Trámites legales\n"
+        "AE. Trámites de traslado\n"
+        "AF. Trámites de internación nacional\n"
+        "AG. Trámites de internación internacional\n\n"
         "📝 Escribe la letra deseada.\n"
         "🔙 Escribe *regresar* para volver a las categorías de servicios individuales.\n"
         "📌 Escribe *menú* para volver al inicio."
@@ -140,14 +140,14 @@ MESSAGES = {
 
     "individual_traslados_menu": (
         "🚚 *Traslados y Carrozas:*\n"
-        "P. Traslado\n" # Letra cambiada para evitar conflicto con planes_futuro_menu
-        "Q. Carroza local\n" # Letra cambiada
-        "R. Carroza a panteón u horno crematorio\n" # Letra cambiada
-        "S. Carroza legal\n" # Letra cambiada
-        "T. Camión local\n" # Letra cambiada
-        "AJ. Traslado carretero por km\n"
-        "AK. Traslado de terracería por km\n"
-        "AL. Camión foráneo por km\n\n"
+        "P. Traslado\n"
+        "Q. Carroza local\n"
+        "R. Carroza a panteón u horno crematorio\n"
+        "S. Carroza legal\n"
+        "T. Camión local\n"
+        "AL. Traslado carretero por km\n"
+        "AM. Traslado de terracería por km\n"
+        "AN. Camión foráneo por km\n\n"
         "📝 Escribe la letra deseada.\n"
         "🔙 Escribe *regresar* para volver a las categorías de servicios individuales.\n"
         "📌 Escribe *menú* para volver al inicio."
@@ -155,12 +155,12 @@ MESSAGES = {
 
     "individual_equipamiento_menu": (
         "🛄 *Objetos y Equipamiento:*\n"
-        "U. Ataúd\n" # Letra cambiada
-        "V. Urna\n" # Letra cambiada
-        "AF. Equipo de velación\n"
-        "AG. Cirios\n"
-        "AH. Capilla de gobierno\n"
-        "AI. Capilla particular\n\n"
+        "U. Ataúd\n"
+        "V. Urna\n"
+        "AH. Equipo de velación\n"
+        "AI. Cirios\n"
+        "AJ. Capilla de gobierno\n"
+        "AK. Capilla particular\n\n"
         "📝 Escribe la letra deseada.\n"
         "🔙 Escribe *regresar* para volver a las categorías de servicios individuales.\n"
         "📌 Escribe *menú* para volver al inicio."
@@ -168,11 +168,11 @@ MESSAGES = {
 
     "individual_procedimientos_menu": (
         "🧪 *Procedimientos Especiales:*\n"
-        "W. Velación\n" # Letra cambiada
-        "X. Boletas\n" # Letra cambiada
-        "Y. Embalsamado\n" # Letra cambiada
-        "Z. Embalsamado legal\n" # Letra cambiada
-        "AA. Embalsamado infecto-contagiosa\n\n" # Letra cambiada
+        "W. Velación\n"
+        "X. Boletas\n"
+        "Y. Embalsamado\n"
+        "Z. Embalsamado legal\n"
+        "AA. Embalsamado infecto-contagiosa\n\n"
         "📝 Escribe la letra deseada.\n"
         "🔙 Escribe *regresar* para volver a las categorías de servicios individuales.\n"
         "📌 Escribe *menú* para volver al inicio."
@@ -308,7 +308,7 @@ selecciones_letras = {
     "z": "embalsamado legal",
     "aa": "embalsamado infecto-contagiosa",
 
-    # Servicios Individuales - Trámites y Papelería (AB-AE)
+    # Servicios Individuales - Trámites y Papelería (AB-AG)
     "ab": "trámites de inhumación",
     "ac": "trámites de cremación",
     "ad": "trámites legales",
