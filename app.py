@@ -21,8 +21,8 @@ TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_MESSAGING_URL = f"https://api.twilio.com/2010-04-01/Accounts/{TWILIO_ACCOUNT_SID}/Messages.json"
 TWILIO_AUTH = (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-NUMERO_REENVIO_PRINCIPAL = os.getenv("NUMERO_REENVIO_PRINCIPAL", "+525523604519")
-NUMERO_REENVIO_SECUNDARIO = os.getenv("NUMERO_REENVIO_SECUNDARIO", "+525523680734") # Asegúrate de configurar esta variable en Render
+NUMERO_REENVIO_PRINCIPAL = os.getenv("NUMERO_REENVIO_PRINCIPAL", "+525523680734")
+NUMERO_REENVIO_SECUNDARIO = os.getenv("NUMERO_REENVIO_SECUNDARIO", "+525511230871") # Asegúrate de configurar esta variable en Render
 
 # Nuevos números de asignación de turno
 NUMERO_ASESOR_2 = os.getenv("NUMERO_ASESOR_2", "+525523680734") # Número para mostrar y recibir resumen (Turno 2)
