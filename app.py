@@ -277,7 +277,7 @@ claves_emergencia = [
 ]
 claves_ubicacion = ["ubicación", "ubicaciones", "sucursal", "sucursales", "dirección", "direccion"]
 claves_cierre = ["gracias", "ok", "vale", "de acuerdo", "listo", "perfecto", "entendido", "muy bien"]
-claves_asesor = ["asesor", "especialista", "ayuda", "humano", "agente"]
+claves_asesor = ["asesor", "especialista", "ayuda", "humano", "agente", "llamar", "marcar", "llamame", "quiero que me llamen", "me pueden marcar"] # Añadida "llamar", "marcar", "llamame", "quiero que me llamen", "me pueden marcar"
 
 # Diccionario de letras -> servicio (ahora solo en minúsculas, la entrada del usuario se convertirá)
 selecciones_letras = {
@@ -469,7 +469,8 @@ def webhook():
             else:
                 return responder(MESSAGES["no_previous_menu"])
 
-        # --- Manejar la palabra clave 'asesor' ---
+        # --- Manejar la palabra clave 'asesor' (prioridad alta) ---
+        # Esto permite al usuario pedir un asesor en cualquier momento, incluso si la sesión es nueva.
         if contiene_flexible(claves_asesor, mensaje):
             numero_asesor = obtener_numero_asesor()
             sesiones[telefono] = {} # Limpiar sesión para iniciar un nuevo flujo de contacto directo
@@ -484,6 +485,7 @@ def webhook():
         # ----------------------------- #
         # FLUJO: BIENVENIDA Y DETECCIÓN INICIAL
         # ----------------------------- #
+        # Esta sección solo se ejecuta si la sesión es nueva y no se detectó "menú", "regresar" o "asesor"
         if not sesiones.get(telefono):
             if contiene_flexible(claves_emergencia, mensaje):
                 sesiones[telefono] = {"menu": "emergencia", "nombre_cliente": "Cliente de Emergencia"} # Placeholder para nombre
@@ -501,6 +503,7 @@ def webhook():
                 sesiones[telefono] = {"menu": "planes", "nombre_cliente": "Cliente de Planes"} # Placeholder para nombre
                 return responder(MESSAGES["plans_menu"])
             else:
+                # Si no se reconoce ninguna de las intenciones iniciales, se envía el mensaje de bienvenida
                 return responder(MESSAGES["welcome"])
 
         # ----------------------------- #
@@ -525,7 +528,8 @@ def webhook():
                 return responder(MESSAGES["emergency_contact_direct"].format(numero_asesor=numero_asesor))
             # Si el cliente responde después de recibir el número de emergencia, se asume que es una confirmación o una solicitud de llamada
             elif sesiones[telefono].get("estado_contacto") == "ofreciendo_contacto_emergencia":
-                if contiene_flexible(["si", "sí", "llámame", "quiero que me llamen"], mensaje):
+                # Aquí se maneja si el cliente pide que le llamen después de recibir el número de emergencia
+                if contiene_flexible(["si", "sí", "llámame", "quiero que me llamen", "me pueden marcar"], mensaje):
                     numero_asesor = sesiones[telefono]["numero_asesor_asignado"]
                     enviar_resumen_asesor(
                         telefono,
@@ -577,7 +581,8 @@ def webhook():
                 elif contiene_flexible(["no", "no gracias", "no por ahora"], mensaje):
                     sesiones[telefono] = {} # Reinicia la sesión
                     return responder(MESSAGES["passive_contact_info"].format(numero_asesor=numero_asesor))
-                elif contiene_flexible(["llámame", "quiero que me llamen"], mensaje):
+                # AÑADIDO: Manejo explícito de "llámame" en este punto
+                elif contiene_flexible(["llámame", "quiero que me llamen", "me pueden marcar"], mensaje):
                     enviar_resumen_asesor(
                         telefono,
                         numero_asesor,
@@ -591,7 +596,8 @@ def webhook():
                     return responder(MESSAGES["invalid_option"])
             elif sesiones[telefono].get("estado_contacto") == "esperando_confirmacion_llamada":
                 # Si el cliente responde después de recibir el número, se asume que es una confirmación o una solicitud de llamada
-                if contiene_flexible(["llámame", "quiero que me llamen"], mensaje):
+                # AÑADIDO: Manejo explícito de "llámame" si ya se dio el número
+                if contiene_flexible(["llámame", "quiero que me llamen", "me pueden marcar"], mensaje):
                     numero_asesor = sesiones[telefono]["numero_asesor_asignado"]
                     enviar_resumen_asesor(
                         telefono,
@@ -680,7 +686,8 @@ def webhook():
                 elif contiene_flexible(["no", "no gracias", "no por ahora"], mensaje):
                     sesiones[telefono] = {} # Reinicia la sesión
                     return responder(MESSAGES["passive_contact_info"].format(numero_asesor=numero_asesor))
-                elif contiene_flexible(["llámame", "quiero que me llamen"], mensaje):
+                # AÑADIDO: Manejo explícito de "llámame" en este punto
+                elif contiene_flexible(["llámame", "quiero que me llamen", "me pueden marcar"], mensaje):
                     enviar_resumen_asesor(
                         telefono,
                         numero_asesor,
@@ -694,7 +701,8 @@ def webhook():
                     return responder(MESSAGES["invalid_option"])
             elif sesiones[telefono].get("estado_contacto") == "esperando_confirmacion_llamada":
                 # Si el cliente responde después de recibir el número, se asume que es una confirmación o una solicitud de llamada
-                if contiene_flexible(["llámame", "quiero que me llamen"], mensaje):
+                # AÑADIDO: Manejo explícito de "llámame" si ya se dio el número
+                if contiene_flexible(["llámame", "quiero que me llamen", "me pueden marcar"], mensaje):
                     numero_asesor = sesiones[telefono]["numero_asesor_asignado"]
                     enviar_resumen_asesor(
                         telefono,
