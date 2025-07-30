@@ -4,7 +4,7 @@ envVars:
   - key: TWILIO_AUTH_TOKEN
     value: tu_token_real
   - key: NUMERO_REENVIO_PRINCIPAL
-    value: +525523680734
+    value: +525523604519
   - key: NUMERO_REENVIO_SECUNDARIO
     value: +525511230871
   - key: NUMERO_ASESOR_2
