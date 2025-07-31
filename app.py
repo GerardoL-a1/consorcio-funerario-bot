@@ -429,10 +429,16 @@ def webhook():
     try:
         mensaje = request.form.get("Body", "").strip()
         telefono = request.form.get("From", "")
+        print(f"📥 Nuevo mensaje: {mensaje} de {telefono}") # Log visual
         logging.info(f"Mensaje recibido: {mensaje} de {telefono}")
 
         if not mensaje:
             return responder(MESSAGES["no_text_received"])
+
+        # --- Forzar una sesión válida en el primer mensaje ---
+        if telefono not in sesiones or not isinstance(sesiones[telefono], dict):
+            sesiones[telefono] = {}
+            print(f"📌 Nueva sesión creada/inicializada para: {telefono}") # Log visual
 
         # --- Reiniciar temporizador de inactividad por cada mensaje recibido ---
         if telefono in temporizadores:
@@ -445,6 +451,7 @@ def webhook():
         # --- Volver al menú principal si se detecta 'menú' con tolerancia (PRIORIDAD ALTA) ---
         if es_mensaje_menu(mensaje):
             sesiones[telefono] = {} # Reinicia completamente la sesión
+            print(f"📌 Sesión reiniciada por 'menú' para: {telefono}") # Log visual
             return responder(MESSAGES["welcome"])
 
         # --- Regresar a submenús si se detecta 'regresar' ---
@@ -479,21 +486,24 @@ def webhook():
         if contiene_flexible(claves_asesor, mensaje):
             numero_asesor = obtener_numero_asesor()
             sesiones[telefono] = {} # Limpiar sesión para iniciar un nuevo flujo de contacto directo
+            print(f"📌 Sesión reiniciada por 'asesor' para: {telefono}") # Log visual
             return responder(MESSAGES["direct_contact_after_rescue"].format(numero_asesor=numero_asesor))
 
 
         # --- Confirmaciones como "gracias", "ok", etc. ---
         if contiene_flexible(claves_cierre, mensaje):
             sesiones[telefono] = {} # Reinicia la sesión después de una confirmación de cierre
+            print(f"📌 Sesión reiniciada por 'cierre' para: {telefono}") # Log visual
             return responder(MESSAGES["thanks_confirmation"])
 
         # ----------------------------- #
         # FLUJO: BIENVENIDA Y DETECCIÓN INICIAL
         # ----------------------------- #
         # Esta sección solo se ejecuta si la sesión es nueva y no se detectó "menú", "regresar" o "asesor"
-        if not sesiones.get(telefono):
+        if not sesiones.get(telefono) or sesiones[telefono].get("menu") is None: # Asegura que la sesión no tenga un menú activo
             if contiene_flexible(claves_emergencia, mensaje):
                 sesiones[telefono] = {"menu": "emergencia", "nombre_cliente": "Cliente de Emergencia"} # Placeholder para nombre
+                print(f"📌 Nueva sesión creada para: {telefono} (Emergencia)") # Log visual
                 # En emergencia, se fuerza el contacto directo
                 numero_asesor = obtener_numero_asesor()
                 sesiones[telefono]["numero_asesor_asignado"] = numero_asesor
@@ -502,14 +512,17 @@ def webhook():
 
             elif contiene_flexible(claves_ubicacion, mensaje):
                 sesiones[telefono] = {"menu": "ubicacion", "nombre_cliente": "Cliente de Ubicación"} # Placeholder para nombre
+                print(f"📌 Nueva sesión creada para: {telefono} (Ubicación)") # Log visual
                 return responder(MESSAGES["location_list"])
 
             elif contiene_flexible(claves_planes, mensaje):
                 sesiones[telefono] = {"menu": "planes", "nombre_cliente": "Cliente de Planes"} # Placeholder para nombre
+                print(f"📌 Nueva sesión creada para: {telefono} (Planes)") # Log visual
                 return responder(MESSAGES["plans_menu"])
-            else:
-                # Si no se reconoce ninguna de las intenciones iniciales, se envía el mensaje de bienvenida
-                return responder(MESSAGES["welcome"])
+            # Si no se reconoce ninguna de las intenciones iniciales, se envía el mensaje de bienvenida
+            # Esta parte se maneja ahora con el fallback al final del webhook.
+            # return responder(MESSAGES["welcome"])
+
 
         # ----------------------------- #
         # FLUJO: EMERGENCIA
@@ -724,8 +737,12 @@ def webhook():
 
 
         # ----------------------------- #
-        # RESPUESTA GENERAL SI NADA COINCIDE
+        # RESPUESTA GENERAL SI NADA COINCIDE (FALLBACK)
         # ----------------------------- #
+        if not sesiones.get(telefono) or sesiones[telefono].get("menu") is None:
+            sesiones[telefono] = {"menu": "inicio_fallback", "nombre_cliente": "Cliente nuevo"}
+            print(f"📌 Sesión inicializada por fallback para: {telefono}") # Log visual
+            return responder(MESSAGES["welcome"])
         return responder(MESSAGES["unrecognized_message"])
 
     except Exception as e:
