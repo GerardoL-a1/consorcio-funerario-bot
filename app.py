@@ -418,6 +418,12 @@ def enviar_resumen_asesor(telefono_cliente, numero_asesor_destino, tipo_origen, 
         logging.info(f"✅ Resumen enviado correctamente a {numero_asesor_destino}")
     else:
         logging.error(f"❌ Error al enviar resumen ({response.status_code}): {response.text}")
+        # Enviar un mensaje al cliente si el envío al asesor falla
+        requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
+            "To": telefono_cliente,
+            "From": "whatsapp:+525510704725",
+            "Body": f"❌ No pudimos enviar tu información al asesor. Código de error: {response.status_code}. Por favor llama directamente."
+        })
 
 
 @app.route("/", methods=["GET"])
@@ -754,4 +760,3 @@ def webhook():
 # ----------------------------- #
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
-
