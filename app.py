@@ -6,6 +6,7 @@ import requests
 import os
 import threading
 import logging
+import json # <--- AÑADIDO: Importar la librería json
 from twilio.twiml.messaging_response import MessagingResponse
 from planes_info import responder_plan
 from difflib import SequenceMatcher  # para comparar palabras similares
@@ -384,46 +385,76 @@ def obtener_numero_asesor():
         turno_actual = 2
     return numero
 
+# --- NUEVA FUNCIÓN PARA ENVIAR PLANTILLA HSM ---
+def enviar_plantilla_resumen_cliente(telefono_asesor, nombre_asesor, nombre_cliente, telefono_cliente, interes_cliente):
+    """
+    Envía la plantilla 'resumen_clientes_cf' al número del asesor.
+    """
+    # Asegúrate de que el número del asesor tenga el prefijo 'whatsapp:'
+    to_number = f"whatsapp:{telefono_asesor}"
+    from_number = "whatsapp:+525510704725" # Tu número de Twilio/WhatsApp Business
+
+    # Las variables deben ser un diccionario y luego serializadas a JSON
+    # Los nombres de las variables en la plantilla son 1, 2, 3, 4
+    variables = {
+        "1": nombre_asesor,
+        "2": nombre_cliente,
+        "3": telefono_cliente, # Ya viene limpio de 'enviar_resumen_asesor'
+        "4": interes_cliente
+    }
+    
+    # Twilio espera el nombre de la plantilla y las variables JSON en el campo 'Body'
+    # El formato es "whatsapp:nombre_de_la_plantilla:{\"1\":\"valor1\", \"2\":\"valor2\"}"
+    template_body = f"whatsapp:resumen_clientes_cf:{json.dumps(variables)}"
+
+    try:
+        response = requests.post(
+            TWILIO_MESSAGING_URL,
+            auth=TWILIO_AUTH,
+            data={
+                "To": to_number,
+                "From": from_number,
+                "Body": template_body
+            }
+        )
+        response.raise_for_status() # Lanza una excepción para códigos de estado HTTP de error
+        logging.info(f"✅ Plantilla 'resumen_clientes_cf' enviada correctamente a {telefono_asesor}")
+        return True
+    except requests.exceptions.RequestException as e:
+        logging.error(f"❌ Error al enviar plantilla 'resumen_clientes_cf' a {telefono_asesor}: {e}")
+        logging.error(f"Respuesta de Twilio: {response.text if response else 'No response'}")
+        return False
+
+# --- FUNCIÓN MODIFICADA: enviar_resumen_asesor ---
 def enviar_resumen_asesor(telefono_cliente, numero_asesor_destino, tipo_origen, descripcion, nota=""):
     """
-    Genera y envía el mensaje resumen al número del asesor.
+    Genera y envía el mensaje resumen al número del asesor usando la plantilla HSM.
     """
-    now = datetime.now()
-    fecha = now.strftime("%d/%m/%Y")
-    hora = now.strftime("%H:%M:%S")
-
     # Eliminar el prefijo "whatsapp:" del número del cliente para el resumen
     nombre_cliente = sesiones.get(telefono_cliente, {}).get("nombre_cliente", "Desconocido")
     telefono_cliente_limpio = telefono_cliente.replace("whatsapp:", "")
 
-    resumen_mensaje = f"""🤖 *MENSAJE DEL ROBOT FUNERARIO* 🤖
+    # Variable 1 de la plantilla: Nombre del asesor. Puedes personalizarlo.
+    # Por ejemplo, si NUMERO_ASESOR_2 es "Juan" y NUMERO_ASESOR_3 es "María"
+    nombre_asesor_para_plantilla = "Asesor de Consorcio Funerario"
+    if numero_asesor_destino == NUMERO_ASESOR_2:
+        nombre_asesor_para_plantilla = "Asesor Juan" # Ejemplo
+    elif numero_asesor_destino == NUMERO_ASESOR_3:
+        nombre_asesor_para_plantilla = "Asesor María" # Ejemplo
 
-🧑 *Nombre*: {nombre_cliente}
-📞 *Número*: {telefono_cliente_limpio}
-📋 *Plan / Emergencia / Ubicación*: {descripcion}
-📍 *Origen*: {tipo_origen}
-📆 *Fecha*: {fecha}
-⏰ *Hora*: {hora}
+    # Variable 4 de la plantilla: Interés del cliente. Combina la descripción y la nota.
+    interes_cliente_para_plantilla = f"Origen: {tipo_origen}. Interés: {descripcion}"
+    if nota:
+        interes_cliente_para_plantilla += f". Nota: {nota}"
 
-🔔 *Nota*: {nota}
-"""
-    response = requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
-        "To": numero_asesor_destino,
-        "From": "whatsapp:+525510704725", # El número del bot que envía el resumen (CORREGIDO)
-        "Body": resumen_mensaje
-    })
-
-    # AGREGADO: Logging para saber si el mensaje fue enviado o falló
-    if response.status_code == 201:
-        logging.info(f"✅ Resumen enviado correctamente a {numero_asesor_destino}")
-    else:
-        logging.error(f"❌ Error al enviar resumen ({response.status_code}): {response.text}")
-        # Enviar un mensaje al cliente si el envío al asesor falla
-        requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
-            "To": telefono_cliente,
-            "From": "whatsapp:+525510704725",
-            "Body": f"❌ No pudimos enviar tu información al asesor. Código de error: {response.status_code}. Por favor llama directamente."
-        })
+    # Llama a la nueva función de envío de plantilla
+    return enviar_plantilla_resumen_cliente(
+        telefono_asesor=numero_asesor_destino.replace("whatsapp:", ""), # Pasa solo el número
+        nombre_asesor=nombre_asesor_para_plantilla,
+        nombre_cliente=nombre_cliente,
+        telefono_cliente=telefono_cliente_limpio,
+        interes_cliente=interes_cliente_para_plantilla
+    )
 
 
 @app.route("/", methods=["GET"])
@@ -760,3 +791,4 @@ def webhook():
 # ----------------------------- #
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
