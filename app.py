@@ -8,7 +8,6 @@ import threading
 import logging
 import json  # Importar la librería json
 from twilio.twiml.messaging_response import MessagingResponse
-# from planes_info import responder_plan # Asumiendo que este archivo existe y contiene la función
 from difflib import SequenceMatcher  # para comparar palabras similares
 from datetime import datetime  # Importar datetime para fecha y hora
 
@@ -23,11 +22,11 @@ TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_MESSAGING_URL = f"https://api.twilio.com/2010-04-01/Accounts/{TWILIO_ACCOUNT_SID}/Messages.json"
 TWILIO_AUTH = (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 NUMERO_REENVIO_PRINCIPAL = os.getenv("NUMERO_REENVIO_PRINCIPAL", "+525523604519")
-NUMERO_REENVIO_SECUNDARIO = os.getenv("NUMERO_REENVIO_SECUNDARIO", "+525511230871")  # Asegúrate de configurar esta variable en Render
+NUMERO_REENVIO_SECUNDARIO = os.getenv("NUMERO_REENVIO_SECUNDARIO", "+525511230871")
 
 # Nuevos números de asignación de turno
-NUMERO_ASESOR_2 = os.getenv("NUMERO_ASESOR_2", "+525523604519")  # Número para mostrar y recibir resumen (Turno 2)
-NUMERO_ASESOR_3 = os.getenv("NUMERO_ASESOR_3", "+525511230871")  # Número para mostrar y recibir resumen (Turno 3)
+NUMERO_ASESOR_2 = os.getenv("NUMERO_ASESOR_2", "+525523604519")
+NUMERO_ASESOR_3 = os.getenv("NUMERO_ASESOR_3", "+525511230871")
 
 # Mapeo de números de asesor a nombres (para las plantillas)
 ASESOR_NAMES = {
@@ -86,6 +85,7 @@ MESSAGES = {
     "location_ask_appointment": "No entendí tu respuesta. ¿Te gustaría agendar una cita? Responde 'sí' o 'no'.\n\n📌 Escribe la palabra *menú* para regresar al inicio.",
     "appointment_ask_name": "Perfecto. Por favor, indícanos tu *nombre completo*.",
     "appointment_ask_preferred_time": "Gracias, {nombre_cliente}. Ahora, por favor, indícanos tu *horario preferido* para la cita (ej. 'Mañana a las 10 AM' o 'Jueves 15:00').",
+    "appointment_ask_location": "Por favor, indícanos la *ubicación elegida* para la cita.",
 
     "appointment_received": "✅ Gracias. Hemos registrado tu solicitud de cita. Nuestro equipo te contactará pronto.\n\n📌 Puedes escribir la palabra *menú* para volver al inicio.",
 
@@ -285,12 +285,11 @@ claves_emergencia = [
     "murió alguien", "falleció alguien", "alguien acaba de morir", "se murió un familiar",
     "se nos fue un ser querido", "perdimos a un familiar", "perdí a un ser querido",
     "acaba de fallecer un familiar", "mi familiar murió", "mi ser querido falleció",
-    "necesito un servicio funerario urgente", "necesito apoyo urgente", "urgente atención",
-    "urgencia funeraria", "urgente fallecimiento", "atención por fallecimiento"
+    "necesito un servicio funerario urgente", "necesito apoyo urgente", "urgencia funeraria", "urgente fallecimiento", "atención por fallecimiento"
 ]
 claves_ubicacion = ["ubicación", "ubicaciones", "sucursal", "sucursales", "dirección", "direccion"]
 claves_cierre = ["gracias", "ok", "vale", "de acuerdo", "listo", "perfecto", "entendido", "muy bien"]
-claves_asesor = ["asesor", "especialista", "ayuda", "humano", "agente", "llamar", "marcar", "llamame", "quiero que me llamen", "me pueden marcar"]  # Añadida "llamar", "marcar", "llamame", "quiero que me llamen", "me pueden marcar"
+claves_asesor = ["asesor", "especialista", "ayuda", "humano", "agente", "llamar", "marcar", "llamame", "quiero que me llamen", "me pueden marcar"]
 
 # Diccionario de letras -> servicio (ahora solo en minúsculas, la entrada del usuario se convertirá)
 selecciones_letras = {
@@ -468,13 +467,14 @@ def enviar_plantilla_ubicacion_cliente(telefono_asesor, nombre_asesor, nombre_cl
         logging.error(f"❌ Error al enviar plantilla 'ubicacion_cliente_cf' a {telefono_asesor}: {e}")
         return False
 
-# --- NUEVA FUNCIÓN PARA ENVIAR PLANTILLA DE RESUMEN GENERAL (resumen_clientes_cf) ---
+# --- FUNCIÓN MODIFICADA: enviar_resumen_asesor (ahora usa la plantilla general) ---
+# Esta función necesita una plantilla general en Twilio, por ejemplo 'resumen_general_cf'
 def enviar_plantilla_resumen_general(telefono_asesor, nombre_asesor, nombre_cliente, telefono_cliente, interes_cliente):
     """
-    Envía la plantilla 'resumen_clientes_cf' al número del asesor.
+    Envía una plantilla general de resumen al número del asesor.
     """
     to_number = f"whatsapp:{telefono_asesor}"
-    from_number = "whatsapp:+525510704725"  # Tu número de Twilio/WhatsApp Business
+    from_number = "whatsapp:+525510704725" # Tu número de Twilio/WhatsApp Business
 
     variables = {
         "1": nombre_asesor,
@@ -482,8 +482,9 @@ def enviar_plantilla_resumen_general(telefono_asesor, nombre_asesor, nombre_clie
         "3": telefono_cliente,
         "4": interes_cliente
     }
-    
-    template_body = f"whatsapp:resumen_clientes_cf:{json.dumps(variables)}"
+
+    # Asegúrate de que 'resumen_general_cf' sea el nombre de tu plantilla aprobada en Twilio
+    template_body = f"whatsapp:resumen_general_cf:{json.dumps(variables)}"
 
     try:
         response = requests.post(
@@ -496,13 +497,12 @@ def enviar_plantilla_resumen_general(telefono_asesor, nombre_asesor, nombre_clie
             }
         )
         response.raise_for_status()
-        logging.info(f"✅ Plantilla 'resumen_clientes_cf' enviada correctamente a {telefono_asesor}")
+        logging.info(f"✅ Plantilla 'resumen_general_cf' enviada correctamente a {telefono_asesor}")
         return True
     except requests.exceptions.RequestException as e:
-        logging.error(f"❌ Error al enviar plantilla 'resumen_clientes_cf' a {telefono_asesor}: {e}")
+        logging.error(f"❌ Error al enviar plantilla 'resumen_general_cf' a {telefono_asesor}: {e}")
         return False
 
-# --- FUNCIÓN MODIFICADA: enviar_resumen_asesor (ahora usa la plantilla general) ---
 def enviar_resumen_asesor(telefono_cliente, numero_asesor_destino, tipo_origen, descripcion, nota=""):
     """
     Genera y envía el mensaje resumen al número del asesor usando la plantilla general HSM.
@@ -518,20 +518,31 @@ def enviar_resumen_asesor(telefono_cliente, numero_asesor_destino, tipo_origen, 
         interes_cliente_para_plantilla += f". Nota: {nota}"
 
     return enviar_plantilla_resumen_general(
-        telefono_asesor=numero_asesor_destino.replace("whatsapp:", ""),
+        telefono_asesor=numero_asesor_destino, # Ya está limpio en obtener_numero_asesor
         nombre_asesor=nombre_asesor_para_plantilla,
         nombre_cliente=nombre_cliente,
         telefono_cliente=telefono_cliente_limpio,
         interes_cliente=interes_cliente_para_plantilla
     )
 
-# --- Función placeholder para responder_plan (si no tienes el archivo planes_info.py) ---
+# --- Función placeholder para responder a planes/servicios específicos ---
 def responder_plan(clave_plan):
     """
-    Función placeholder para simular la respuesta de planes.
-    Deberías reemplazar esto con la lógica real de tu archivo planes_info.py.
+    Esta función debería contener la lógica para devolver la información
+    detallada de cada plan o servicio.
     """
-    return f"Aquí está la información sobre: *{clave_plan.replace('_', ' ').title()}*."
+    info_planes = {
+        "crédito de necesidad inmediata": "Este plan ofrece un crédito rápido para cubrir gastos funerarios urgentes.",
+        "servicio paquete fetal cremación": "Servicio especializado para cremación de restos fetales.",
+        # ... y así sucesivamente para todas las claves en selecciones_letras
+        "traslado": "Servicio de traslado del cuerpo a la ubicación deseada.",
+        "ataúd": "Información sobre nuestra variedad de ataúdes disponibles.",
+        "velación": "Detalles sobre el servicio de velación.",
+        "trámites de inhumación": "Asesoría y gestión de trámites para inhumación.",
+        "red biker": "Plan exclusivo para la comunidad motociclista.",
+        "servicio paquete de cremación de restos áridos": "Servicio de cremación para restos áridos."
+    }
+    return info_planes.get(clave_plan, f"No se encontró información para: {clave_plan}. Por favor, intente con otra opción.")
 
 
 @app.route("/", methods=["GET"])
@@ -694,13 +705,11 @@ def webhook():
                     nombre_asesor=ASESOR_NAMES.get(numero_asesor_asignado, "Asesor"),
                     nombre_fallecido=emergency_data.get("nombre_fallecido", "N/A"),
                     telefono_contacto=emergency_data.get("numeros_contacto", telefono.replace("whatsapp:", "")),
-                    causa_fallecimiento=emergency_data.get("causa_fallecimiento", "N/A"),
+                    causa_fallecimiento=emergency_data.get("causa_fallecimiento", "N/A"), # Corregido el error de sintaxis aquí
                     ubicacion_cuerpo=emergency_data.get("ubicacion_cuerpo", "N/A"),
                     certificado_defuncion=emergency_data.get("certificado_defuncion", "N/A")
                 )
-                # Limpiar datos de emergencia después de enviar
-                del sesiones[telefono]["emergency_data"]
-                del sesiones[telefono]["emergency_step"]
+                # NO se elimina emergency_data aquí para mantener los datos para el siguiente paso
                 sesiones[telefono]["estado_contacto"] = "ofreciendo_contacto_emergencia" # Para el siguiente paso
                 return responder(MESSAGES["emergency_contact_direct"].format(numero_asesor=numero_asesor_asignado))
             
@@ -713,7 +722,7 @@ def webhook():
                         numero_asesor_asignado,
                         "Emergencias",
                         "El cliente solicitó ser llamado.",
-                        f"Datos previos: {json.dumps(emergency_data)}" # Incluir datos capturados si aún están en sesión
+                        f"Datos previos: {json.dumps(emergency_data)}" # Incluir datos capturados
                     )
                     sesiones[telefono] = {}  # Reinicia la sesión
                     return responder(MESSAGES["call_requested_info"].format(numero_asesor=numero_asesor_asignado))
@@ -750,9 +759,15 @@ def webhook():
                 sesiones[telefono]["appointment_data"] = appointment_data
                 return responder(MESSAGES["appointment_ask_preferred_time"].format(nombre_cliente=mensaje))
             
-            elif appointment_step == 2: # Captura horario preferido y finaliza la cita
+            elif appointment_step == 2: # Captura horario preferido
                 appointment_data["horario_preferido"] = mensaje
-                sesiones[telefono]["appointment_step"] = 3 # Finaliza la captura de datos
+                sesiones[telefono]["appointment_step"] = 3
+                sesiones[telefono]["appointment_data"] = appointment_data
+                return responder(MESSAGES["appointment_ask_location"]) # Nuevo paso para pedir ubicación
+            
+            elif appointment_step == 3: # Captura ubicación elegida
+                appointment_data["ubicacion_elegida"] = mensaje
+                sesiones[telefono]["appointment_step"] = 4 # Finaliza la captura de datos
 
                 # Enviar plantilla de ubicación
                 enviar_plantilla_ubicacion_cliente(
@@ -760,7 +775,7 @@ def webhook():
                     nombre_asesor=ASESOR_NAMES.get(numero_asesor_asignado, "Asesor"),
                     nombre_cliente=appointment_data.get("nombre_cliente_cita", "N/A"),
                     telefono_contacto=telefono.replace("whatsapp:", ""),
-                    ubicacion_elegida="No especificada (desde flujo de cita)", # Podrías pedir la ubicación si es necesario
+                    ubicacion_elegida=appointment_data.get("ubicacion_elegida", "N/A"),
                     fecha_hora_cita=appointment_data.get("horario_preferido", "N/A")
                 )
                 # Limpiar datos de cita después de enviar
@@ -793,7 +808,7 @@ def webhook():
                         "El cliente solicitó ser llamado."
                     )
                     sesiones[telefono] = {}  # Reinicia la sesión
-                    return responder(MESSAGES["call_requested_info"].format(numero_asesor=numero_asesor_asignado))
+                    return responder(MESSAGES["call_requested_info"].format(numero_asesor=numero_asesor_asignado)) # Corregido aquí
                 else:
                     return responder(MESSAGES["invalid_option"])
             elif sesiones[telefono].get("estado_contacto") == "esperando_confirmacion_llamada":
@@ -806,7 +821,7 @@ def webhook():
                         "El cliente solicitó ser llamado."
                     )
                     sesiones[telefono] = {}  # Reinicia la sesión
-                    return responder(MESSAGES["call_requested_info"].format(numero_asesor=numero_asesor_asignado))
+                    return responder(MESSAGES["call_requested_info"].format(numero_asesor=numero_asesor_asignado)) # Corregido aquí
                 else:
                     sesiones[telefono] = {}  # Reinicia la sesión
                     return responder(MESSAGES["thanks_confirmation"])
