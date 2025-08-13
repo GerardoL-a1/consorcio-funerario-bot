@@ -396,24 +396,14 @@ def obtener_numero_asesor():
         turno_actual = 2
     return numero
 
+
 # --- NUEVA FUNCIÓN PARA ENVIAR PLANTILLA DE EMERGENCIA ---
 def enviar_plantilla_emergencia_cliente(telefono_asesor, nombre_asesor, nombre_fallecido, telefono_contacto, causa_fallecimiento, ubicacion_cuerpo, certificado_defuncion):
     """
-    Envía la plantilla 'emergencia_cliente_cf' al número del asesor.
+    Envía la plantilla 'emergencia_cliente_cf' al número del asesor usando ContentSid.
     """
     to_number = f"whatsapp:{telefono_asesor}"
     from_number = "whatsapp:+525510704725"  # Tu número de Twilio/WhatsApp Business
-
-    variables = {
-        "1": nombre_asesor,
-        "2": nombre_fallecido,
-        "3": telefono_contacto,
-        "4": causa_fallecimiento,
-        "5": ubicacion_cuerpo,
-        "6": certificado_defuncion
-    }
-    
-    template_body = f"whatsapp:emergencia_cliente_cf:{json.dumps(variables)}"
 
     try:
         response = requests.post(
@@ -422,7 +412,15 @@ def enviar_plantilla_emergencia_cliente(telefono_asesor, nombre_asesor, nombre_f
             data={
                 "To": to_number,
                 "From": from_number,
-                "Body": template_body
+                "ContentSid": "HX45cdcc80ab9e7a45a105f0ee7c1cb19f",  # ID real de la plantilla
+                "ContentVariables": json.dumps({
+                    "1": nombre_asesor,
+                    "2": nombre_fallecido,
+                    "3": telefono_contacto,
+                    "4": causa_fallecimiento,
+                    "5": ubicacion_cuerpo,
+                    "6": certificado_defuncion
+                })
             }
         )
         response.raise_for_status()
@@ -432,23 +430,14 @@ def enviar_plantilla_emergencia_cliente(telefono_asesor, nombre_asesor, nombre_f
         logging.error(f"❌ Error al enviar plantilla 'emergencia_cliente_cf' a {telefono_asesor}: {e}")
         return False
 
+
 # --- NUEVA FUNCIÓN PARA ENVIAR PLANTILLA DE UBICACIÓN ---
 def enviar_plantilla_ubicacion_cliente(telefono_asesor, nombre_asesor, nombre_cliente, telefono_contacto, ubicacion_elegida, fecha_hora_cita):
     """
-    Envía la plantilla 'ubicacion_cliente_cf' al número del asesor.
+    Envía la plantilla 'ubicacion_cliente_cf' al número del asesor usando ContentSid.
     """
     to_number = f"whatsapp:{telefono_asesor}"
-    from_number = "whatsapp:+525510704725"  # Tu número de Twilio/WhatsApp Business
-
-    variables = {
-        "1": nombre_asesor,
-        "2": nombre_cliente,
-        "3": telefono_contacto,
-        "4": ubicacion_elegida,
-        "5": fecha_hora_cita
-    }
-    
-    template_body = f"whatsapp:ubicacion_cliente_cf:{json.dumps(variables)}"
+    from_number = "whatsapp:+525510704725"
 
     try:
         response = requests.post(
@@ -457,7 +446,14 @@ def enviar_plantilla_ubicacion_cliente(telefono_asesor, nombre_asesor, nombre_cl
             data={
                 "To": to_number,
                 "From": from_number,
-                "Body": template_body
+                "ContentSid": "HXe7d43debe52a0a0e7b4dd19415a5465",  # ID real de la plantilla
+                "ContentVariables": json.dumps({
+                    "1": nombre_asesor,
+                    "2": nombre_cliente,
+                    "3": telefono_contacto,
+                    "4": ubicacion_elegida,
+                    "5": fecha_hora_cita
+                })
             }
         )
         response.raise_for_status()
@@ -467,24 +463,14 @@ def enviar_plantilla_ubicacion_cliente(telefono_asesor, nombre_asesor, nombre_cl
         logging.error(f"❌ Error al enviar plantilla 'ubicacion_cliente_cf' a {telefono_asesor}: {e}")
         return False
 
+
 # --- FUNCIÓN MODIFICADA: enviar_resumen_asesor (ahora usa la plantilla general) ---
-# Esta función necesita una plantilla general en Twilio, por ejemplo 'resumen_general_cf'
 def enviar_plantilla_resumen_general(telefono_asesor, nombre_asesor, nombre_cliente, telefono_cliente, interes_cliente):
     """
-    Envía una plantilla general de resumen al número del asesor.
+    Envía la plantilla 'resumen_general_cf' al número del asesor usando ContentSid.
     """
     to_number = f"whatsapp:{telefono_asesor}"
-    from_number = "whatsapp:+525510704725" # Tu número de Twilio/WhatsApp Business
-
-    variables = {
-        "1": nombre_asesor,
-        "2": nombre_cliente,
-        "3": telefono_cliente,
-        "4": interes_cliente
-    }
-
-    # Asegúrate de que 'resumen_general_cf' sea el nombre de tu plantilla aprobada en Twilio
-    template_body = f"whatsapp:resumen_general_cf:{json.dumps(variables)}"
+    from_number = "whatsapp:+525510704725"
 
     try:
         response = requests.post(
@@ -493,7 +479,13 @@ def enviar_plantilla_resumen_general(telefono_asesor, nombre_asesor, nombre_clie
             data={
                 "To": to_number,
                 "From": from_number,
-                "Body": template_body
+                "ContentSid": "HXc050def3724ea3bf540353c5f28886a5",  # ID real de la plantilla
+                "ContentVariables": json.dumps({
+                    "1": nombre_asesor,
+                    "2": nombre_cliente,
+                    "3": telefono_cliente,
+                    "4": interes_cliente
+                })
             }
         )
         response.raise_for_status()
@@ -502,6 +494,7 @@ def enviar_plantilla_resumen_general(telefono_asesor, nombre_asesor, nombre_clie
     except requests.exceptions.RequestException as e:
         logging.error(f"❌ Error al enviar plantilla 'resumen_general_cf' a {telefono_asesor}: {e}")
         return False
+
 
 def enviar_resumen_asesor(telefono_cliente, numero_asesor_destino, tipo_origen, descripcion, nota=""):
     """
