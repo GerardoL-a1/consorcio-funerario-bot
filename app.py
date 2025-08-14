@@ -17,14 +17,15 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 
 # --- Variables de Entorno y Constantes ---
+# Asegúrate de que estas variables de entorno estén configuradas en tu despliegue.
+# Por ejemplo, en Render, Heroku, o tu servidor.
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_MESSAGING_URL = f"https://api.twilio.com/2010-04-01/Accounts/{TWILIO_ACCOUNT_SID}/Messages.json"
 TWILIO_AUTH = (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-NUMERO_REENVIO_PRINCIPAL = os.getenv("NUMERO_REENVIO_PRINCIPAL", "+525523604519")
-NUMERO_REENVIO_SECUNDARIO = os.getenv("NUMERO_REENVIO_SECUNDARIO", "+525511230871")
 
-# Nuevos números de asignación de turno
+# Números de reenvío principales y secundarios (usados para asignación de turno)
+# Asegúrate de que estos números estén en formato E.164 y puedan recibir WhatsApp.
 NUMERO_ASESOR_2 = os.getenv("NUMERO_ASESOR_2", "+525523604519")
 NUMERO_ASESOR_3 = os.getenv("NUMERO_ASESOR_3", "+525511230871")
 
@@ -348,13 +349,19 @@ def responder(texto):
 
 def mensaje_inactividad(numero):
     if numero in sesiones:
-        requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
-            "To": numero,
-            "From": "whatsapp:+525510704725",
-            "Body": MESSAGES["inactivity_warning"]
-        })
-        temporizadores.pop(numero, None)
-        sesiones.pop(numero, None)  # Limpiar sesión al expirar inactividad
+        logging.info(f"Enviando advertencia de inactividad a {numero}")
+        try:
+            requests.post(TWILIO_MESSAGING_URL, auth=TWILIO_AUTH, data={
+                "To": numero,
+                "From": "whatsapp:+525510704725", # Asegúrate que este es tu número de WhatsApp Business de Twilio
+                "Body": MESSAGES["inactivity_warning"]
+            })
+            logging.info(f"Advertencia de inactividad enviada a {numero}")
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Error al enviar advertencia de inactividad a {numero}: {e}")
+        finally:
+            temporizadores.pop(numero, None)
+            sesiones.pop(numero, None)  # Limpiar sesión al expirar inactividad
 
 def parecido(palabra_objetivo, mensaje, umbral=0.75):
     """Detecta si una palabra es suficientemente parecida al mensaje recibido."""
@@ -394,10 +401,14 @@ def obtener_numero_asesor():
     else:
         numero = NUMERO_ASESOR_3
         turno_actual = 2
+    logging.info(f"Asignando asesor: {numero} (próximo turno: {turno_actual})")
     return numero
 
 
-# --- NUEVA FUNCIÓN PARA ENVIAR PLANTILLA DE EMERGENCIA ---
+# --- FUNCIONES PARA ENVIAR PLANTILLAS ---
+# Asegúrate de que los ContentSid (HX...) sean los correctos para tus plantillas aprobadas en Twilio.
+# Asegúrate de que el número 'From' sea tu número de WhatsApp Business de Twilio.
+
 def enviar_plantilla_emergencia_cliente(telefono_asesor, nombre_asesor, nombre_fallecido, telefono_contacto, causa_fallecimiento, ubicacion_cuerpo, certificado_defuncion):
     """
     Envía la plantilla 'emergencia_cliente_cf' al número del asesor usando ContentSid.
@@ -405,6 +416,7 @@ def enviar_plantilla_emergencia_cliente(telefono_asesor, nombre_asesor, nombre_f
     to_number = f"whatsapp:{telefono_asesor}"
     from_number = "whatsapp:+525510704725"  # Tu número de Twilio/WhatsApp Business
 
+    logging.info(f"Intentando enviar plantilla de emergencia a {to_number} desde {from_number}")
     try:
         response = requests.post(
             TWILIO_MESSAGING_URL,
@@ -423,15 +435,19 @@ def enviar_plantilla_emergencia_cliente(telefono_asesor, nombre_asesor, nombre_f
                 })
             }
         )
-        response.raise_for_status()
-        logging.info(f"✅ Plantilla 'emergencia_cliente_cf' enviada correctamente a {telefono_asesor}")
+        response.raise_for_status() # Lanza una excepción para códigos de estado HTTP 4xx/5xx
+        logging.info(f"✅ Plantilla 'emergencia_cliente_cf' enviada correctamente a {telefono_asesor}. SID: {response.json().get('sid')}")
         return True
     except requests.exceptions.RequestException as e:
-        logging.error(f"❌ Error al enviar plantilla 'emergencia_cliente_cf' a {telefono_asesor}: {e}")
+        logging.error(f"❌ Error al enviar plantilla 'emergencia_cliente_cf' a {telefono_asesor}: {type(e).__name__} - {e}")
+        if hasattr(e, 'response') and e.response is not None:
+            logging.error(f"Respuesta de Twilio (emergencia): {e.response.text}")
+        return False
+    except Exception as e:
+        logging.error(f"❌ Error inesperado al enviar plantilla de emergencia: {type(e).__name__} - {e}")
         return False
 
 
-# --- NUEVA FUNCIÓN PARA ENVIAR PLANTILLA DE UBICACIÓN ---
 def enviar_plantilla_ubicacion_cliente(telefono_asesor, nombre_asesor, nombre_cliente, telefono_contacto, ubicacion_elegida, fecha_hora_cita):
     """
     Envía la plantilla 'ubicacion_cliente_cf' al número del asesor usando ContentSid.
@@ -439,6 +455,7 @@ def enviar_plantilla_ubicacion_cliente(telefono_asesor, nombre_asesor, nombre_cl
     to_number = f"whatsapp:{telefono_asesor}"
     from_number = "whatsapp:+525510704725"
 
+    logging.info(f"Intentando enviar plantilla de ubicación a {to_number} desde {from_number}")
     try:
         response = requests.post(
             TWILIO_MESSAGING_URL,
@@ -457,14 +474,18 @@ def enviar_plantilla_ubicacion_cliente(telefono_asesor, nombre_asesor, nombre_cl
             }
         )
         response.raise_for_status()
-        logging.info(f"✅ Plantilla 'ubicacion_cliente_cf' enviada correctamente a {telefono_asesor}")
+        logging.info(f"✅ Plantilla 'ubicacion_cliente_cf' enviada correctamente a {telefono_asesor}. SID: {response.json().get('sid')}")
         return True
     except requests.exceptions.RequestException as e:
-        logging.error(f"❌ Error al enviar plantilla 'ubicacion_cliente_cf' a {telefono_asesor}: {e}")
+        logging.error(f"❌ Error al enviar plantilla 'ubicacion_cliente_cf' a {telefono_asesor}: {type(e).__name__} - {e}")
+        if hasattr(e, 'response') and e.response is not None:
+            logging.error(f"Respuesta de Twilio (ubicación): {e.response.text}")
+        return False
+    except Exception as e:
+        logging.error(f"❌ Error inesperado al enviar plantilla de ubicación: {type(e).__name__} - {e}")
         return False
 
 
-# --- FUNCIÓN MODIFICADA: enviar_resumen_asesor (ahora usa la plantilla general) ---
 def enviar_plantilla_resumen_general(telefono_asesor, nombre_asesor, nombre_cliente, telefono_cliente, interes_cliente):
     """
     Envía la plantilla 'resumen_general_cf' al número del asesor usando ContentSid.
@@ -472,6 +493,7 @@ def enviar_plantilla_resumen_general(telefono_asesor, nombre_asesor, nombre_clie
     to_number = f"whatsapp:{telefono_asesor}"
     from_number = "whatsapp:+525510704725"
 
+    logging.info(f"Intentando enviar plantilla de resumen general a {to_number} desde {from_number}")
     try:
         response = requests.post(
             TWILIO_MESSAGING_URL,
@@ -489,10 +511,15 @@ def enviar_plantilla_resumen_general(telefono_asesor, nombre_asesor, nombre_clie
             }
         )
         response.raise_for_status()
-        logging.info(f"✅ Plantilla 'resumen_general_cf' enviada correctamente a {telefono_asesor}")
+        logging.info(f"✅ Plantilla 'resumen_general_cf' enviada correctamente a {telefono_asesor}. SID: {response.json().get('sid')}")
         return True
     except requests.exceptions.RequestException as e:
-        logging.error(f"❌ Error al enviar plantilla 'resumen_general_cf' a {telefono_asesor}: {e}")
+        logging.error(f"❌ Error al enviar plantilla 'resumen_general_cf' a {telefono_asesor}: {type(e).__name__} - {e}")
+        if hasattr(e, 'response') and e.response is not None:
+            logging.error(f"Respuesta de Twilio (resumen general): {e.response.text}")
+        return False
+    except Exception as e:
+        logging.error(f"❌ Error inesperado al enviar plantilla de resumen general: {type(e).__name__} - {e}")
         return False
 
 
@@ -510,8 +537,9 @@ def enviar_resumen_asesor(telefono_cliente, numero_asesor_destino, tipo_origen, 
     if nota:
         interes_cliente_para_plantilla += f". Nota: {nota}"
 
+    logging.info(f"Preparando resumen para asesor {numero_asesor_destino}: Cliente={nombre_cliente}, Tel={telefono_cliente_limpio}, Interés={interes_cliente_para_plantilla}")
     return enviar_plantilla_resumen_general(
-        telefono_asesor=numero_asesor_destino, # Ya está limpio en obtener_numero_asesor
+        telefono_asesor=numero_asesor_destino,
         nombre_asesor=nombre_asesor_para_plantilla,
         nombre_cliente=nombre_cliente,
         telefono_cliente=telefono_cliente_limpio,
@@ -527,13 +555,44 @@ def responder_plan(clave_plan):
     info_planes = {
         "crédito de necesidad inmediata": "Este plan ofrece un crédito rápido para cubrir gastos funerarios urgentes.",
         "servicio paquete fetal cremación": "Servicio especializado para cremación de restos fetales.",
-        # ... y así sucesivamente para todas las claves en selecciones_letras
+        "servicio paquete sencillo sepultura": "Servicio de sepultura con paquete sencillo.",
+        "servicio paquete básico sepultura": "Servicio de sepultura con paquete básico.",
+        "servicio cremación directa": "Servicio de cremación sin velación previa.",
+        "servicio paquete de cremación": "Paquete completo de servicio de cremación.",
+        "servicio paquete legal": "Servicio que incluye trámites legales funerarios.",
+        "servicio de refrigeración y conservación": "Servicio para la conservación del cuerpo.",
+        "red biker": "Plan exclusivo para la comunidad motociclista, con beneficios especiales.",
+        "red plus": "Plan con cobertura amplia y beneficios adicionales.",
+        "red consorcio": "Nuestro plan más completo, con todos los servicios incluidos.",
+        "red adulto mayor": "Plan diseñado específicamente para adultos mayores, con facilidades de pago.",
+        "preventa de nichos a temporalidad": "Adquiere un nicho con anticipación por un periodo determinado.",
+        "cremación amigo fiel": "Servicio de cremación para mascotas, tu compañero fiel.",
+        "servicio paquete de cremación de restos áridos": "Servicio de cremación para restos óseos.",
         "traslado": "Servicio de traslado del cuerpo a la ubicación deseada.",
-        "ataúd": "Información sobre nuestra variedad de ataúdes disponibles.",
-        "velación": "Detalles sobre el servicio de velación.",
+        "carroza local": "Servicio de carroza para traslados dentro de la localidad.",
+        "carroza a panteón u horno crematorio": "Servicio de carroza para el traslado final al panteón o crematorio.",
+        "carroza legal": "Servicio de carroza que cumple con requisitos legales específicos.",
+        "camión local": "Servicio de camión para traslados locales de mayor volumen.",
+        "ataúd": "Información sobre nuestra variedad de ataúdes disponibles, desde económicos hasta de lujo.",
+        "urna": "Detalles sobre los tipos de urnas disponibles para cenizas.",
+        "velación": "Detalles sobre el servicio de velación, incluyendo opciones de capilla y duración.",
+        "boletas": "Información sobre la emisión y gestión de boletas.",
+        "embalsamado": "Servicio de embalsamado para la conservación del cuerpo.",
+        "embalsamado legal": "Servicio de embalsamado que cumple con normativas legales.",
+        "embalsamado infecto-contagiosa": "Servicio de embalsamado especializado para casos de enfermedades infecto-contagiosas.",
         "trámites de inhumación": "Asesoría y gestión de trámites para inhumación.",
-        "red biker": "Plan exclusivo para la comunidad motociclista.",
-        "servicio paquete de cremación de restos áridos": "Servicio de cremación para restos áridos."
+        "trámites de cremación": "Asesoría y gestión de trámites para cremación.",
+        "trámites legales": "Asesoría y gestión de trámites legales relacionados con el fallecimiento.",
+        "trámites de traslado": "Gestión de la documentación necesaria para el traslado del cuerpo.",
+        "trámites de internación nacional": "Trámites para el traslado del cuerpo dentro del territorio nacional.",
+        "trámites de internación internacional": "Trámites para el traslado del cuerpo a nivel internacional.",
+        "equipo de velación": "Alquiler de equipo necesario para la velación en domicilio.",
+        "cirios": "Suministro de cirios para el servicio funerario.",
+        "capilla de gobierno": "Uso de capillas proporcionadas por el gobierno.",
+        "capilla particular": "Uso de nuestras capillas privadas para la velación.",
+        "traslado carretero por km": "Costo de traslado por carretera calculado por kilómetro.",
+        "traslado de terracería por km": "Costo de traslado en caminos de terracería calculado por kilómetro.",
+        "camión foráneo por km": "Costo de camión para traslados foráneos calculado por kilómetro."
     }
     return info_planes.get(clave_plan, f"No se encontró información para: {clave_plan}. Por favor, intente con otra opción.")
 
@@ -551,12 +610,13 @@ def webhook():
         logging.info(f"Mensaje recibido: {mensaje} de {telefono}")
 
         if not mensaje:
+            logging.warning(f"Mensaje vacío recibido de {telefono}")
             return responder(MESSAGES["no_text_received"])
 
         # --- Forzar una sesión válida en el primer mensaje ---
         if telefono not in sesiones or not isinstance(sesiones[telefono], dict):
             sesiones[telefono] = {}
-            print(f"📌 Nueva sesión creada/inicializada para: {telefono}")  # Log visual
+            logging.info(f"📌 Nueva sesión creada/inicializada para: {telefono}")
 
         # --- Reiniciar temporizador de inactividad por cada mensaje recibido ---
         if telefono in temporizadores:
@@ -565,11 +625,12 @@ def webhook():
         temporizador = threading.Timer(600, mensaje_inactividad, args=(telefono,))  # 10 minutos
         temporizador.start()
         temporizadores[telefono] = temporizador
+        logging.debug(f"Temporizador de inactividad reiniciado para {telefono}")
 
         # --- Volver al menú principal si se detecta 'menú' con tolerancia (PRIORIDAD ALTA) ---
         if es_mensaje_menu(mensaje):
             sesiones[telefono] = {}  # Reinicia completamente la sesión
-            print(f"📌 Sesión reiniciada por 'menú' para: {telefono}")  # Log visual
+            logging.info(f"📌 Sesión reiniciada por 'menú' para: {telefono}")
             return responder(MESSAGES["welcome"])
 
         # --- Regresar a submenús si se detecta 'regresar' ---
@@ -581,73 +642,83 @@ def webhook():
             current_emergency_step = current_session.get("emergency_step")
             current_appointment_step = current_session.get("appointment_step")
 
+            logging.info(f"Usuario {telefono} solicitó 'regresar'. Estado actual: menu={current_menu}, submenu={current_submenu}, menu_serv={current_menu_serv}, emergency_step={current_emergency_step}, appointment_step={current_appointment_step}")
+
             if current_emergency_step: # Si está en un paso de emergencia, regresa al inicio de emergencia
                 sesiones[telefono] = {"menu": "emergencia", "nombre_cliente": "Cliente de Emergencia"}
+                logging.info(f"Regresando a emergency_prompt para {telefono}")
                 return responder(MESSAGES["emergency_prompt"])
             elif current_appointment_step: # Si está en un paso de cita, regresa al inicio de ubicación
                 sesiones[telefono] = {"menu": "ubicacion", "nombre_cliente": "Cliente de Ubicación"}
+                logging.info(f"Regresando a location_list para {telefono}")
                 return responder(MESSAGES["location_list"])
             elif current_menu == "planes":
                 if current_menu_serv and current_menu_serv != "categorias":
                     sesiones[telefono]["menu_serv"] = "categorias"
+                    logging.info(f"Regresando a individual_categories para {telefono}")
                     return responder(MESSAGES["individual_categories"])
                 elif current_submenu:
                     del sesiones[telefono]["submenu"]
                     if "menu_serv" in sesiones[telefono]:
                         del sesiones[telefono]["menu_serv"]
+                    logging.info(f"Regresando a plans_menu para {telefono}")
                     return responder(MESSAGES["plans_menu"])
                 else:
+                    logging.info(f"No hay menú anterior para regresar para {telefono} en planes.")
                     return responder(MESSAGES["no_previous_menu"])
             elif current_menu == "ubicacion" or current_menu == "cita":
                 if current_menu == "cita":
                     sesiones[telefono]["menu"] = "ubicacion"
+                    logging.info(f"Regresando a location_list desde cita para {telefono}")
                     return responder(MESSAGES["location_list"])
                 else:
+                    logging.info(f"No hay menú anterior para regresar para {telefono} en ubicación/cita.")
                     return responder(MESSAGES["no_previous_menu"])
             else:
+                logging.info(f"No hay menú anterior para regresar para {telefono}.")
                 return responder(MESSAGES["no_previous_menu"])
 
         # --- Manejar la palabra clave 'asesor' (prioridad alta) ---
-        # Esto permite al usuario pedir un asesor en cualquier momento, incluso si la sesión es nueva.
         if contiene_flexible(claves_asesor, mensaje):
             numero_asesor = obtener_numero_asesor()
             sesiones[telefono] = {}  # Limpiar sesión para iniciar un nuevo flujo de contacto directo
-            print(f"📌 Sesión reiniciada por 'asesor' para: {telefono}")  # Log visual
+            logging.info(f"📌 Sesión reiniciada por 'asesor' para: {telefono}. Ofreciendo contacto directo.")
             return responder(MESSAGES["direct_contact_after_rescue"].format(numero_asesor=numero_asesor))
 
         # --- Confirmaciones como "gracias", "ok", etc. ---
         if contiene_flexible(claves_cierre, mensaje):
             sesiones[telefono] = {}  # Reinicia la sesión después de una confirmación de cierre
-            print(f"📌 Sesión reiniciada por 'cierre' para: {telefono}")  # Log visual
+            logging.info(f"📌 Sesión reiniciada por 'cierre' para: {telefono}")
             return responder(MESSAGES["thanks_confirmation"])
 
         # ----------------------------- #
         # FLUJO: BIENVENIDA Y DETECCIÓN INICIAL
         # ----------------------------- #
-        # Esta sección solo se ejecuta si la sesión es nueva y no se detectó "menú", "regresar" o "asesor"
-        if not sesiones.get(telefono) or sesiones[telefono].get("menu") is None:  # Asegura que la sesión no tenga un menú activo
+        if not sesiones.get(telefono) or sesiones[telefono].get("menu") is None:
+            logging.info(f"Detectando intención inicial para {telefono} con mensaje: '{mensaje}'")
             if contiene_flexible(claves_emergencia, mensaje):
                 sesiones[telefono] = {
                     "menu": "emergencia",
                     "nombre_cliente": "Cliente de Emergencia",
-                    "emergency_step": 1, # Inicia el paso 1 de la emergencia
-                    "emergency_data": {} # Para almacenar los datos de la emergencia
+                    "emergency_step": 1,
+                    "emergency_data": {}
                 }
-                print(f"📌 Nueva sesión creada para: {telefono} (Emergencia)")  # Log visual
+                logging.info(f"📌 Nueva sesión: Emergencia para {telefono}")
                 return responder(MESSAGES["emergency_prompt"])
 
             elif contiene_flexible(claves_ubicacion, mensaje):
-                sesiones[telefono] = {"menu": "ubicacion", "nombre_cliente": "Cliente de Ubicación"}  # Placeholder para nombre
-                print(f"📌 Nueva sesión creada para: {telefono} (Ubicación)")  # Log visual
+                sesiones[telefono] = {"menu": "ubicacion", "nombre_cliente": "Cliente de Ubicación"}
+                logging.info(f"📌 Nueva sesión: Ubicación para {telefono}")
                 return responder(MESSAGES["location_list"])
 
             elif contiene_flexible(claves_planes, mensaje):
-                sesiones[telefono] = {"menu": "planes", "nombre_cliente": "Cliente de Planes"}  # Placeholder para nombre
-                print(f"📌 Nueva sesión creada para: {telefono} (Planes)")  # Log visual
+                sesiones[telefono] = {"menu": "planes", "nombre_cliente": "Cliente de Planes"}
+                logging.info(f"📌 Nueva sesión: Planes para {telefono}")
                 return responder(MESSAGES["plans_menu"])
-            # Si no se reconoce ninguna de las intenciones iniciales, se envía el mensaje de bienvenida
-            # Esta parte se maneja ahora con el fallback al final del webhook.
-            # return responder(MESSAGES["welcome"])
+            else:
+                logging.info(f"Mensaje inicial no reconocido para {telefono}. Enviando bienvenida.")
+                sesiones[telefono] = {"menu": "inicio_fallback", "nombre_cliente": "Cliente nuevo"}
+                return responder(MESSAGES["welcome"])
 
         # ----------------------------- #
         # FLUJO: EMERGENCIA (GUIADO PASO A PASO)
@@ -656,7 +727,9 @@ def webhook():
             emergency_step = sesiones[telefono].get("emergency_step", 0)
             emergency_data = sesiones[telefono].get("emergency_data", {})
             numero_asesor_asignado = sesiones[telefono].get("numero_asesor_asignado", obtener_numero_asesor())
-            sesiones[telefono]["numero_asesor_asignado"] = numero_asesor_asignado # Asegura que esté guardado
+            sesiones[telefono]["numero_asesor_asignado"] = numero_asesor_asignado
+
+            logging.info(f"Flujo de emergencia para {telefono}. Paso: {emergency_step}")
 
             if emergency_step == 1:
                 emergency_data["nombre_fallecido"] = mensaje
@@ -679,6 +752,7 @@ def webhook():
                 elif mensaje.lower() in ["no"]:
                     emergency_data["certificado_defuncion"] = "No"
                 else:
+                    logging.warning(f"Respuesta inválida para certificado de defunción de {telefono}: '{mensaje}'")
                     return responder(MESSAGES["emergency_certificate_invalid"])
                 sesiones[telefono]["emergency_step"] = 5
                 sesiones[telefono]["emergency_data"] = emergency_data
@@ -692,36 +766,35 @@ def webhook():
                 emergency_data["nombre_contactante"] = mensaje
                 sesiones[telefono]["emergency_step"] = 7 # Finaliza la captura de datos
 
-                # Enviar plantilla de emergencia
+                logging.info(f"Datos de emergencia completos para {telefono}. Enviando plantilla a asesor {numero_asesor_asignado}.")
                 enviar_plantilla_emergencia_cliente(
                     telefono_asesor=numero_asesor_asignado,
                     nombre_asesor=ASESOR_NAMES.get(numero_asesor_asignado, "Asesor"),
                     nombre_fallecido=emergency_data.get("nombre_fallecido", "N/A"),
                     telefono_contacto=emergency_data.get("numeros_contacto", telefono.replace("whatsapp:", "")),
-                    causa_fallecimiento=emergency_data.get("causa_fallecimiento", "N/A"), # Corregido el error de sintaxis aquí
+                    causa_fallecimiento=emergency_data.get("causa_fallecimiento", "N/A"),
                     ubicacion_cuerpo=emergency_data.get("ubicacion_cuerpo", "N/A"),
                     certificado_defuncion=emergency_data.get("certificado_defuncion", "N/A")
                 )
-                # NO se elimina emergency_data aquí para mantener los datos para el siguiente paso
-                sesiones[telefono]["estado_contacto"] = "ofreciendo_contacto_emergencia" # Para el siguiente paso
+                sesiones[telefono]["estado_contacto"] = "ofreciendo_contacto_emergencia"
                 return responder(MESSAGES["emergency_contact_direct"].format(numero_asesor=numero_asesor_asignado))
             
-            # Si el cliente responde después de recibir el número de emergencia, se asume que es una confirmación o una solicitud de llamada
             elif sesiones[telefono].get("estado_contacto") == "ofreciendo_contacto_emergencia":
+                logging.info(f"Usuario {telefono} responde a oferta de contacto de emergencia: '{mensaje}'")
                 if contiene_flexible(["si", "sí", "llámame", "quiero que me llamen", "me pueden marcar"], mensaje):
-                    # Enviar resumen general indicando que el cliente solicitó ser llamado
+                    logging.info(f"Usuario {telefono} solicitó ser llamado para emergencia.")
                     enviar_resumen_asesor(
                         telefono,
                         numero_asesor_asignado,
                         "Emergencias",
                         "El cliente solicitó ser llamado.",
-                        f"Datos previos: {json.dumps(emergency_data)}" # Incluir datos capturados
+                        f"Datos previos: {json.dumps(emergency_data, ensure_ascii=False)}" # Incluir datos capturados
                     )
-                    sesiones[telefono] = {}  # Reinicia la sesión
+                    sesiones[telefono] = {}
                     return responder(MESSAGES["call_requested_info"].format(numero_asesor=numero_asesor_asignado))
                 else:
-                    # Si no es una solicitud de llamada, se asume que ya se le dio el número y se cierra el flujo
-                    sesiones[telefono] = {}  # Reinicia la sesión
+                    logging.info(f"Usuario {telefono} no solicitó llamada para emergencia. Finalizando flujo.")
+                    sesiones[telefono] = {}
                     return responder(MESSAGES["thanks_confirmation"])
 
         # ----------------------------- #
@@ -731,38 +804,43 @@ def webhook():
             appointment_step = sesiones[telefono].get("appointment_step", 0)
             appointment_data = sesiones[telefono].get("appointment_data", {})
             numero_asesor_asignado = sesiones[telefono].get("numero_asesor_asignado", obtener_numero_asesor())
-            sesiones[telefono]["numero_asesor_asignado"] = numero_asesor_asignado # Asegura que esté guardado
+            sesiones[telefono]["numero_asesor_asignado"] = numero_asesor_asignado
 
-            if "estado_cita" not in sesiones[telefono]:  # Primera pregunta sobre agendar cita
+            logging.info(f"Flujo de ubicación para {telefono}. Paso: {appointment_step}")
+
+            if "estado_cita" not in sesiones[telefono]:
+                logging.info(f"Usuario {telefono} responde a pregunta de cita: '{mensaje}'")
                 if mensaje.lower() in ["sí", "si", "si me gustaría", "si quiero"]:
                     sesiones[telefono]["estado_cita"] = "solicitando_datos_cita"
-                    sesiones[telefono]["appointment_step"] = 1 # Inicia el paso 1 de la cita
-                    sesiones[telefono]["appointment_data"] = {} # Para almacenar los datos de la cita
+                    sesiones[telefono]["appointment_step"] = 1
+                    sesiones[telefono]["appointment_data"] = {}
                     return responder(MESSAGES["appointment_ask_name"])
                 elif mensaje.lower() in ["no", "no gracias", "no por ahora"]:
-                    sesiones[telefono] = {}  # Reinicia la sesión si no quiere cita
+                    logging.info(f"Usuario {telefono} no desea agendar cita. Ofreciendo contacto pasivo.")
+                    sesiones[telefono] = {}
                     return responder(MESSAGES["passive_contact_info"].format(numero_asesor=numero_asesor_asignado))
                 else:
+                    logging.warning(f"Respuesta inválida para agendar cita de {telefono}: '{mensaje}'")
                     return responder(MESSAGES["location_ask_appointment"])
             
-            elif appointment_step == 1: # Captura nombre del cliente para la cita
+            elif appointment_step == 1:
                 appointment_data["nombre_cliente_cita"] = mensaje
-                sesiones[telefono]["nombre_cliente"] = mensaje # Actualiza el nombre del cliente en la sesión principal
+                sesiones[telefono]["nombre_cliente"] = mensaje
                 sesiones[telefono]["appointment_step"] = 2
                 sesiones[telefono]["appointment_data"] = appointment_data
                 return responder(MESSAGES["appointment_ask_preferred_time"].format(nombre_cliente=mensaje))
             
-            elif appointment_step == 2: # Captura horario preferido
+            elif appointment_step == 2:
                 appointment_data["horario_preferido"] = mensaje
                 sesiones[telefono]["appointment_step"] = 3
                 sesiones[telefono]["appointment_data"] = appointment_data
-                return responder(MESSAGES["appointment_ask_location"]) # Nuevo paso para pedir ubicación
+                return responder(MESSAGES["appointment_ask_location"])
             
-            elif appointment_step == 3: # Captura ubicación elegida
+            elif appointment_step == 3:
                 appointment_data["ubicacion_elegida"] = mensaje
-                sesiones[telefono]["appointment_step"] = 4 # Finaliza la captura de datos
+                sesiones[telefono]["appointment_step"] = 4
 
-                # Enviar plantilla de ubicación
+                logging.info(f"Datos de cita completos para {telefono}. Enviando plantilla a asesor {numero_asesor_asignado}.")
                 enviar_plantilla_ubicacion_cliente(
                     telefono_asesor=numero_asesor_asignado,
                     nombre_asesor=ASESOR_NAMES.get(numero_asesor_asignado, "Asesor"),
@@ -771,16 +849,16 @@ def webhook():
                     ubicacion_elegida=appointment_data.get("ubicacion_elegida", "N/A"),
                     fecha_hora_cita=appointment_data.get("horario_preferido", "N/A")
                 )
-                # Limpiar datos de cita después de enviar
                 del sesiones[telefono]["appointment_data"]
                 del sesiones[telefono]["appointment_step"]
-                sesiones[telefono]["estado_contacto"] = "preguntar_contacto_ubicacion" # Para el siguiente paso
+                sesiones[telefono]["estado_contacto"] = "preguntar_contacto_ubicacion"
                 return responder(MESSAGES["appointment_received"] + "\n\n" + MESSAGES["ask_contact_interest"])
 
-            # Lógica para preguntar contacto después de agendar cita
             elif sesiones[telefono].get("estado_contacto") == "preguntar_contacto_ubicacion":
+                logging.info(f"Usuario {telefono} responde a oferta de contacto de ubicación: '{mensaje}'")
                 if contiene_flexible(["sí", "si", "si me gustaría", "si quiero"], mensaje):
                     sesiones[telefono]["estado_contacto"] = "esperando_confirmacion_llamada"
+                    logging.info(f"Usuario {telefono} desea contactar por ubicación. Enviando resumen.")
                     enviar_resumen_asesor(
                         telefono,
                         numero_asesor_asignado,
@@ -790,9 +868,11 @@ def webhook():
                     )
                     return responder(MESSAGES["direct_contact_info"].format(numero_asesor=numero_asesor_asignado))
                 elif contiene_flexible(["no", "no gracias", "no por ahora"], mensaje):
-                    sesiones[telefono] = {}  # Reinicia la sesión
+                    logging.info(f"Usuario {telefono} no desea contactar por ubicación. Ofreciendo contacto pasivo.")
+                    sesiones[telefono] = {}
                     return responder(MESSAGES["passive_contact_info"].format(numero_asesor=numero_asesor_asignado))
                 elif contiene_flexible(["llámame", "quiero que me llamen", "me pueden marcar"], mensaje):
+                    logging.info(f"Usuario {telefono} solicitó ser llamado para ubicación.")
                     enviar_resumen_asesor(
                         telefono,
                         numero_asesor_asignado,
@@ -800,12 +880,15 @@ def webhook():
                         f"Cita agendada: {sesiones[telefono].get('nombre_cliente', 'N/A')} - {appointment_data.get('horario_preferido', 'N/A')}",
                         "El cliente solicitó ser llamado."
                     )
-                    sesiones[telefono] = {}  # Reinicia la sesión
-                    return responder(MESSAGES["call_requested_info"].format(numero_asesor=numero_asesor_asignado)) # Corregido aquí
+                    sesiones[telefono] = {}
+                    return responder(MESSAGES["call_requested_info"].format(numero_asesor=numero_asesor_asignado))
                 else:
+                    logging.warning(f"Respuesta inválida para contacto de ubicación de {telefono}: '{mensaje}'")
                     return responder(MESSAGES["invalid_option"])
             elif sesiones[telefono].get("estado_contacto") == "esperando_confirmacion_llamada":
+                logging.info(f"Usuario {telefono} responde a confirmación de llamada de ubicación: '{mensaje}'")
                 if contiene_flexible(["llámame", "quiero que me llamen", "me pueden marcar"], mensaje):
+                    logging.info(f"Usuario {telefono} re-solicitó ser llamado para ubicación.")
                     enviar_resumen_asesor(
                         telefono,
                         numero_asesor_asignado,
@@ -813,16 +896,18 @@ def webhook():
                         f"Cita agendada: {sesiones[telefono].get('nombre_cliente', 'N/A')} - {appointment_data.get('horario_preferido', 'N/A')}",
                         "El cliente solicitó ser llamado."
                     )
-                    sesiones[telefono] = {}  # Reinicia la sesión
-                    return responder(MESSAGES["call_requested_info"].format(numero_asesor=numero_asesor_asignado)) # Corregido aquí
+                    sesiones[telefono] = {}
+                    return responder(MESSAGES["call_requested_info"].format(numero_asesor=numero_asesor_asignado))
                 else:
-                    sesiones[telefono] = {}  # Reinicia la sesión
+                    logging.info(f"Usuario {telefono} no re-solicitó llamada para ubicación. Finalizando flujo.")
+                    sesiones[telefono] = {}
                     return responder(MESSAGES["thanks_confirmation"])
 
         # ----------------------------- #
         # FLUJO: PLANES
         # ----------------------------- #
         if sesiones[telefono].get("menu") == "planes":
+            logging.info(f"Flujo de planes para {telefono}. Submenú: {sesiones[telefono].get('submenu')}, Menu_serv: {sesiones[telefono].get('menu_serv')}")
             if "submenu" not in sesiones[telefono]:
                 if mensaje == "1":
                     sesiones[telefono]["submenu"] = "inmediato"
@@ -835,6 +920,7 @@ def webhook():
                     sesiones[telefono]["menu_serv"] = "categorias"
                     return responder(MESSAGES["individual_categories"])
                 else:
+                    logging.warning(f"Opción inválida en menú principal de planes para {telefono}: '{mensaje}'")
                     return responder(MESSAGES["invalid_option"])
 
             elif sesiones[telefono]["submenu"] in ["inmediato", "futuro"]:
@@ -844,8 +930,10 @@ def webhook():
                     respuesta_plan = responder_plan(clave)
                     sesiones[telefono]["descripcion_resumen"] = f"Información de plan: {clave}"
                     sesiones[telefono]["estado_contacto"] = "preguntar_contacto_planes"
+                    logging.info(f"Usuario {telefono} seleccionó plan/servicio: {clave}. Preguntando por contacto.")
                     return responder(respuesta_plan + "\n\n" + MESSAGES["ask_contact_interest"])
                 else:
+                    logging.warning(f"Letra no reconocida en submenú de planes para {telefono}: '{mensaje}'")
                     return responder(MESSAGES["letter_not_recognized"])
 
             elif sesiones[telefono]["submenu"] == "servicios":
@@ -864,6 +952,7 @@ def webhook():
                         sesiones[telefono]["menu_serv"] = "procedimientos"
                         return responder(MESSAGES["individual_procedimientos_menu"])
                     else:
+                        logging.warning(f"Categoría no reconocida en servicios individuales para {telefono}: '{mensaje}'")
                         return responder(MESSAGES["category_not_recognized"])
                 elif sesiones[telefono]["menu_serv"] in ["tramites", "traslados", "equipamiento", "procedimientos"]:
                     if letra in selecciones_letras:
@@ -871,16 +960,20 @@ def webhook():
                         respuesta_plan = responder_plan(clave)
                         sesiones[telefono]["descripcion_resumen"] = f"Información de servicio individual: {clave}"
                         sesiones[telefono]["estado_contacto"] = "preguntar_contacto_planes"
+                        logging.info(f"Usuario {telefono} seleccionó servicio individual: {clave}. Preguntando por contacto.")
                         return responder(respuesta_plan + "\n\n" + MESSAGES["ask_contact_interest"])
                     else:
+                        logging.warning(f"Letra no reconocida en submenú de servicios individuales para {telefono}: '{mensaje}'")
                         return responder(MESSAGES["letter_not_recognized"])
 
             # Lógica para preguntar contacto después de dar información de plan/servicio
             if sesiones[telefono].get("estado_contacto") == "preguntar_contacto_planes":
                 numero_asesor = obtener_numero_asesor()
                 sesiones[telefono]["numero_asesor_asignado"] = numero_asesor
+                logging.info(f"Usuario {telefono} responde a oferta de contacto de planes: '{mensaje}'")
                 if contiene_flexible(["sí", "si", "si me gustaría", "si quiero"], mensaje):
                     sesiones[telefono]["estado_contacto"] = "esperando_confirmacion_llamada"
+                    logging.info(f"Usuario {telefono} desea contactar por planes. Enviando resumen.")
                     enviar_resumen_asesor(
                         telefono,
                         numero_asesor,
@@ -890,10 +983,11 @@ def webhook():
                     )
                     return responder(MESSAGES["direct_contact_info"].format(numero_asesor=numero_asesor))
                 elif contiene_flexible(["no", "no gracias", "no por ahora"], mensaje):
-                    sesiones[telefono] = {}  # Reinicia la sesión
+                    logging.info(f"Usuario {telefono} no desea contactar por planes. Ofreciendo contacto pasivo.")
+                    sesiones[telefono] = {}
                     return responder(MESSAGES["passive_contact_info"].format(numero_asesor=numero_asesor))
-                # AÑADIDO: Manejo explícito de "llámame" en este punto
                 elif contiene_flexible(["llámame", "quiero que me llamen", "me pueden marcar"], mensaje):
+                    logging.info(f"Usuario {telefono} solicitó ser llamado para planes.")
                     enviar_resumen_asesor(
                         telefono,
                         numero_asesor,
@@ -901,14 +995,15 @@ def webhook():
                         sesiones[telefono].get("descripcion_resumen", "Información de plan/servicio."),
                         "El cliente solicitó ser llamado."
                     )
-                    sesiones[telefono] = {}  # Reinicia la sesión
+                    sesiones[telefono] = {}
                     return responder(MESSAGES["call_requested_info"].format(numero_asesor=numero_asesor))
                 else:
+                    logging.warning(f"Respuesta inválida para contacto de planes de {telefono}: '{mensaje}'")
                     return responder(MESSAGES["invalid_option"])
             elif sesiones[telefono].get("estado_contacto") == "esperando_confirmacion_llamada":
-                # Si el cliente responde después de recibir el número, se asume que es una confirmación o una solicitud de llamada
-                # AÑADIDO: Manejo explícito de "llámame" si ya se dio el número
+                logging.info(f"Usuario {telefono} responde a confirmación de llamada de planes: '{mensaje}'")
                 if contiene_flexible(["llámame", "quiero que me llamen", "me pueden marcar"], mensaje):
+                    logging.info(f"Usuario {telefono} re-solicitó ser llamado para planes.")
                     enviar_resumen_asesor(
                         telefono,
                         numero_asesor,
@@ -916,23 +1011,21 @@ def webhook():
                         sesiones[telefono].get("descripcion_resumen", "Información de plan/servicio."),
                         "El cliente solicitó ser llamado."
                     )
-                    sesiones[telefono] = {}  # Reinicia la sesión
+                    sesiones[telefono] = {}
                     return responder(MESSAGES["call_requested_info"].format(numero_asesor=numero_asesor))
                 else:
-                    sesiones[telefono] = {}  # Reinicia la sesión
+                    logging.info(f"Usuario {telefono} no re-solicitó llamada para planes. Finalizando flujo.")
+                    sesiones[telefono] = {}
                     return responder(MESSAGES["thanks_confirmation"])
 
         # ----------------------------- #
         # RESPUESTA GENERAL SI NADA COINCIDE (FALLBACK)
         # ----------------------------- #
-        if not sesiones.get(telefono) or sesiones[telefono].get("menu") is None:
-            sesiones[telefono] = {"menu": "inicio_fallback", "nombre_cliente": "Cliente nuevo"}
-            print(f"📌 Sesión inicializada por fallback para: {telefono}")  # Log visual
-            return responder(MESSAGES["welcome"])
+        logging.info(f"Mensaje no reconocido en ningún flujo para {telefono}: '{mensaje}'. Enviando mensaje de no reconocimiento.")
         return responder(MESSAGES["unrecognized_message"])
 
     except Exception as e:
-        logging.error(f"Error inesperado en webhook: {e}", exc_info=True)
+        logging.error(f"Error inesperado en webhook para {telefono}: {type(e).__name__} - {e}", exc_info=True)
         return responder(MESSAGES["general_error"])
 
 # ----------------------------- #
@@ -940,3 +1033,4 @@ def webhook():
 # ----------------------------- #
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
